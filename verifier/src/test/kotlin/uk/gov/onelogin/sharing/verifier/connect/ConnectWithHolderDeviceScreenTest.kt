@@ -5,10 +5,13 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.test.espresso.intent.Intents
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.testing.junit.testparameterinjector.TestParameter
 import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,6 +19,7 @@ import org.robolectric.RobolectricTestParameterInjector
 import uk.gov.logging.testdouble.SystemLogger
 import uk.gov.onelogin.sharing.bluetooth.api.adapter.FakeBluetoothAdapterProvider
 import uk.gov.onelogin.sharing.bluetooth.api.scanner.FakeAndroidBluetoothScanner
+import uk.gov.onelogin.sharing.bluetooth.ble.FakeBluetoothStateMonitor
 import uk.gov.onelogin.sharing.security.DecoderStub.VALID_CBOR
 import uk.gov.onelogin.sharing.security.DecoderStub.validDeviceEngagementDto
 import uk.gov.onelogin.sharing.security.DeviceEngagementStub.ENGAGEMENT_EXPECTED_BASE_64
@@ -34,6 +38,16 @@ class ConnectWithHolderDeviceScreenTest {
     @get:Rule
     val composeTestRule = ConnectWithHolderDeviceRule(createComposeRule())
 
+    @Before
+    fun setup() {
+        Intents.init()
+    }
+
+    @After
+    fun tearDown() {
+        Intents.release()
+    }
+
     @TestParameter(valuesProvider = ConnectWithHolderDeviceRenderProvider::class)
     lateinit var renderFunction: (
         ConnectWithHolderDeviceRule,
@@ -49,11 +63,11 @@ class ConnectWithHolderDeviceScreenTest {
     fun cannotDecodeProvidedCborString() = runTest {
         val fakeBluetoothProvider = FakeBluetoothAdapterProvider(isEnabled = false)
         val fakeBluetoothScanner = FakeAndroidBluetoothScanner()
-
         val testViewModel = SessionEstablishmentViewModel(
             bluetoothAdapterProvider = fakeBluetoothProvider,
             scanner = fakeBluetoothScanner,
             logger = SystemLogger(),
+            bluetoothStatusMonitor = FakeBluetoothStateMonitor(),
             verifierSessionFactory = { mdocVerifierSession }
         )
 
@@ -81,6 +95,7 @@ class ConnectWithHolderDeviceScreenTest {
                 bluetoothAdapterProvider = FakeBluetoothAdapterProvider(isEnabled = false),
                 scanner = FakeAndroidBluetoothScanner(),
                 logger = SystemLogger(),
+                bluetoothStatusMonitor = FakeBluetoothStateMonitor(),
                 verifierSessionFactory = { mdocVerifierSession }
             )
             renderFunction(
@@ -108,6 +123,7 @@ class ConnectWithHolderDeviceScreenTest {
             bluetoothAdapterProvider = fakeBluetoothProvider,
             scanner = fakeBluetoothScanner,
             logger = SystemLogger(),
+            bluetoothStatusMonitor = FakeBluetoothStateMonitor(),
             verifierSessionFactory = { mdocVerifierSession }
         )
 
@@ -135,6 +151,7 @@ class ConnectWithHolderDeviceScreenTest {
             bluetoothAdapterProvider = fakeBluetoothProvider,
             scanner = fakeBluetoothScanner,
             logger = SystemLogger(),
+            bluetoothStatusMonitor = FakeBluetoothStateMonitor(),
             verifierSessionFactory = { mdocVerifierSession }
         )
         composeTestRule.run {
@@ -163,6 +180,7 @@ class ConnectWithHolderDeviceScreenTest {
             bluetoothAdapterProvider = fakeBluetoothProvider,
             scanner = fakeBluetoothScanner,
             logger = SystemLogger(),
+            bluetoothStatusMonitor = FakeBluetoothStateMonitor(),
             verifierSessionFactory = { mdocVerifierSession }
         )
 
@@ -197,6 +215,7 @@ class ConnectWithHolderDeviceScreenTest {
                 contentState = errorState,
                 engagementData = validDeviceEngagementDto,
                 permissionsGranted = true,
+                bluetoothPrompt = {},
                 modifier = Modifier
             )
         }

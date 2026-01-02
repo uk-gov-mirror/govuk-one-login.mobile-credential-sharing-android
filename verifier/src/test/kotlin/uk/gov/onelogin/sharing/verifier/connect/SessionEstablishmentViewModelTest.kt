@@ -5,6 +5,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
+import kotlin.test.assertFalse
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.awaitClose
@@ -22,11 +23,13 @@ import org.junit.Rule
 import org.junit.Test
 import uk.gov.logging.testdouble.SystemLogger
 import uk.gov.onelogin.sharing.bluetooth.api.adapter.FakeBluetoothAdapterProvider
+import uk.gov.onelogin.sharing.bluetooth.api.core.BluetoothStatus
 import uk.gov.onelogin.sharing.bluetooth.api.scanner.BluetoothScanner
 import uk.gov.onelogin.sharing.bluetooth.api.scanner.FakeAndroidBluetoothScanner
 import uk.gov.onelogin.sharing.bluetooth.api.scanner.ScanEvent
 import uk.gov.onelogin.sharing.bluetooth.api.scanner.ScannerFailure
 import uk.gov.onelogin.sharing.bluetooth.ble.DEVICE_ADDRESS
+import uk.gov.onelogin.sharing.bluetooth.ble.FakeBluetoothStateMonitor
 import uk.gov.onelogin.sharing.core.MainDispatcherRule
 import uk.gov.onelogin.sharing.models.mdoc.deviceretrievalmethods.toByteArray
 import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceStateStubs.fakePermissionStateDenied
@@ -42,6 +45,7 @@ class SessionEstablishmentViewModelTest {
     val bluetoothAdapterProvider = FakeBluetoothAdapterProvider(isEnabled = true)
     val scanner = FakeAndroidBluetoothScanner()
     val logger = SystemLogger()
+    val fakeBluetoothStateMonitor = FakeBluetoothStateMonitor()
     val fakeVerifierSession = FakeVerifierSession()
 
     lateinit var viewModel: SessionEstablishmentViewModel
@@ -51,6 +55,7 @@ class SessionEstablishmentViewModelTest {
         scanner = scanner,
         dispatcher = mainDispatcherRule.testDispatcher,
         logger = logger,
+        bluetoothStatusMonitor = fakeBluetoothStateMonitor,
         verifierSessionFactory = { fakeVerifierSession }
     )
 
@@ -219,5 +224,43 @@ class SessionEstablishmentViewModelTest {
 
         val logMessage = logger[0].message
         assert(logMessage.contains("Bluetooth permissions were denied"))
+    }
+
+    @Test
+    fun `should set isBluetoothEnabled state to off when prompt is denied`() = runTest {
+        viewModel = createViewModel(scanner)
+
+        fakeBluetoothStateMonitor.emit(BluetoothStatus.OFF)
+
+        assertEquals(false, viewModel.uiState.value.isBluetoothEnabled)
+    }
+
+    @Test
+    fun `should set isBluetoothEnabled state to true when bluetooth enabled`() = runTest {
+        viewModel = createViewModel(scanner)
+
+        fakeBluetoothStateMonitor.emit(BluetoothStatus.ON)
+
+        assertEquals(true, viewModel.uiState.value.isBluetoothEnabled)
+    }
+
+    @Test
+    fun `should set bluetoothPromptResult true when prompt enabled`() {
+        viewModel = createViewModel(scanner)
+
+        viewModel.updateBluetoothPromptResult(true)
+        val logMessage = logger[0].message
+        assert(logMessage.contains("User enabled bluetooth via prompt"))
+        assertTrue(viewModel.uiState.value.bluetoothPromptResult)
+    }
+
+    @Test
+    fun `should set bluetoothPromptResult false when prompt denied`() {
+        viewModel = createViewModel(scanner)
+
+        viewModel.updateBluetoothPromptResult(false)
+        val logMessage = logger[0].message
+        assert(logMessage.contains("User cancelled bluetooth prompt"))
+        assertFalse(viewModel.uiState.value.bluetoothPromptResult)
     }
 }

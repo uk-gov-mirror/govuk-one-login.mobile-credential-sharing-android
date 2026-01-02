@@ -1,7 +1,12 @@
 package uk.gov.onelogin.sharing.verifier.connect
 
 import android.Manifest
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.content.Intent
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -102,6 +107,7 @@ fun ConnectWithHolderDeviceScreen(
             contentState = contentState,
             engagementData = engagementData,
             permissionsGranted = multiplePermissionsState.allPermissionsGranted,
+            bluetoothPrompt = { viewModel.updateBluetoothPromptResult(it) },
             modifier = Modifier
         )
         Box(
@@ -124,8 +130,28 @@ fun ConnectWithHolderDeviceScreenContent(
     contentState: ConnectWithHolderDeviceState,
     engagementData: DeviceEngagementDto?,
     permissionsGranted: Boolean,
+    bluetoothPrompt: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    if (permissionsGranted) {
+        val launcher =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                bluetoothPrompt(
+                    result.resultCode == Activity.RESULT_OK
+                )
+            }
+
+        LaunchedEffect(contentState.isBluetoothEnabled) {
+            if (!contentState.isBluetoothEnabled) {
+                launcher.launch(
+                    Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                )
+            }
+        }
+    }
+
     if (contentState.showErrorScreen) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -245,6 +271,7 @@ internal fun ConnectWithHolderDevicePreview(
             contentState = ConnectWithHolderDeviceState(),
             engagementData = engagementData,
             permissionsGranted = true,
+            bluetoothPrompt = {},
             modifier = Modifier.background(Color.White)
         )
     }

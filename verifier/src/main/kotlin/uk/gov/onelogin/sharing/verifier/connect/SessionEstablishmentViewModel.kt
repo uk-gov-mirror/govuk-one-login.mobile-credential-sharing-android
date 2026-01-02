@@ -23,6 +23,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import uk.gov.logging.api.Logger
 import uk.gov.onelogin.sharing.bluetooth.api.adapter.BluetoothAdapterProvider
+import uk.gov.onelogin.sharing.bluetooth.api.core.BluetoothStateMonitor
+import uk.gov.onelogin.sharing.bluetooth.api.core.BluetoothStatus
 import uk.gov.onelogin.sharing.bluetooth.api.scanner.BluetoothScanner
 import uk.gov.onelogin.sharing.bluetooth.api.scanner.ScanEvent
 import uk.gov.onelogin.sharing.bluetooth.permissions.isPermanentlyDenied
@@ -38,7 +40,8 @@ class SessionEstablishmentViewModel(
     verifierSessionFactory: VerifierSessionFactory,
     private val scanner: BluetoothScanner,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val logger: Logger
+    private val logger: Logger,
+    private val bluetoothStatusMonitor: BluetoothStateMonitor
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ConnectWithHolderDeviceState())
@@ -51,6 +54,33 @@ class SessionEstablishmentViewModel(
             it.copy(
                 isBluetoothEnabled = bluetoothAdapterProvider.isEnabled()
             )
+        }
+
+        bluetoothStatusMonitor.start()
+        viewModelScope.launch {
+            bluetoothStatusMonitor.states.collect { bluetoothState ->
+                when (bluetoothState) {
+                    BluetoothStatus.TURNING_ON -> {
+                        _uiState.update {
+                            it.copy(
+                                isBluetoothEnabled = true
+                            )
+                        }
+                        logger.debug(logTag, "Device bluetooth was enabled")
+                    }
+
+                    BluetoothStatus.OFF -> {
+                        _uiState.update {
+                            it.copy(
+                                isBluetoothEnabled = false
+                            )
+                        }
+                        logger.debug(logTag, "Bluetooth turned off")
+                    }
+
+                    else -> Unit
+                }
+            }
         }
     }
 
@@ -130,6 +160,26 @@ class SessionEstablishmentViewModel(
             else -> {
                 logger.debug(logTag, "Bluetooth permissions were denied")
             }
+        }
+    }
+
+    fun updateBluetoothPromptResult(promptResult: Boolean) {
+        if (promptResult) {
+            logger.debug(
+                logTag,
+                "User enabled bluetooth via prompt"
+            )
+        } else {
+            logger.debug(
+                logTag,
+                "User cancelled bluetooth prompt"
+            )
+        }
+
+        _uiState.update {
+            it.copy(
+                bluetoothPromptResult = promptResult
+            )
         }
     }
 
