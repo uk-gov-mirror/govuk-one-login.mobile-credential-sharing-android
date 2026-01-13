@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 import uk.gov.onelogin.sharing.bluetooth.api.core.BluetoothStatus
 
 class FakeVerifierSession : VerifierSession {
-    override val state: StateFlow<VerifierSessionState> =
-        MutableStateFlow(VerifierSessionState.Idle)
+    val mutableState = MutableStateFlow<VerifierSessionState>(VerifierSessionState.Idle)
+    override val state: StateFlow<VerifierSessionState> = mutableState
+
     override val bluetoothStatus: StateFlow<BluetoothStatus> = MutableStateFlow(BluetoothStatus.ON)
 
     var startCalls = 0

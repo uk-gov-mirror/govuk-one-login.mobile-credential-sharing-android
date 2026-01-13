@@ -36,6 +36,7 @@ import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceStateStub
 import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceStateStubs.fakePermissionStateDeniedWithRationale
 import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceStateStubs.fakePermissionStateGranted
 import uk.gov.onelogin.sharing.verifier.session.FakeVerifierSession
+import uk.gov.onelogin.sharing.verifier.session.VerifierSessionState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SessionEstablishmentViewModelTest {
@@ -98,6 +99,8 @@ class SessionEstablishmentViewModelTest {
         val logMessage = logger[0].message
         assert(logMessage.contains("Bluetooth device found"))
         assert(logMessage.contains(bluetoothDevice.address))
+
+        assertEquals(1, fakeVerifierSession.connectCalls)
     }
 
     @Test
@@ -242,5 +245,31 @@ class SessionEstablishmentViewModelTest {
         fakeBluetoothStateMonitor.emit(BluetoothStatus.ON)
 
         assertEquals(true, viewModel.uiState.value.isBluetoothEnabled)
+    }
+
+    @Test
+    fun `should display error screen when session throws an error`() = runTest {
+        val bluetoothDevice = mockk<BluetoothDevice>()
+        every { bluetoothDevice.address } returns DEVICE_ADDRESS
+
+        val scanner = BluetoothScanner {
+            flowOf(ScanEvent.DeviceFound(bluetoothDevice))
+        }
+
+        val viewModel = createViewModel(scanner)
+        viewModel.updatePermissions(true)
+
+        val uuid = UUID.randomUUID()
+
+        viewModel.scanForDevice(uuid.toByteArray())
+        runCurrent()
+
+        fakeVerifierSession.mutableState.emit(
+            VerifierSessionState.Error(
+                message = "something went wrong here"
+            )
+        )
+
+        assertEquals(true, viewModel.uiState.value.showErrorScreen)
     }
 }

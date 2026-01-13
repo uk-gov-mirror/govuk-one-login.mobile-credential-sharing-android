@@ -30,7 +30,9 @@ import uk.gov.onelogin.sharing.bluetooth.api.scanner.ScanEvent
 import uk.gov.onelogin.sharing.bluetooth.permissions.isPermanentlyDenied
 import uk.gov.onelogin.sharing.core.UUIDExtensions.toUUID
 import uk.gov.onelogin.sharing.core.logger.logTag
+import uk.gov.onelogin.sharing.verifier.session.MdocVerifierSession
 import uk.gov.onelogin.sharing.verifier.session.VerifierSessionFactory
+import uk.gov.onelogin.sharing.verifier.session.VerifierSessionState
 
 @Inject
 @ViewModelKey(SessionEstablishmentViewModel::class)
@@ -121,8 +123,14 @@ class SessionEstablishmentViewModel(
 
     private fun connect(device: BluetoothDevice, serviceUuid: ByteArray) {
         viewModelScope.launch(dispatcher) {
-            mdocVerifierSession.state.collect {
-                logger.debug(logTag, "Session state: $it")
+            mdocVerifierSession.state.collect { state ->
+                when (state) {
+                    is VerifierSessionState.Error -> {
+                        _uiState.update { it.copy(showErrorScreen = true) }
+                    }
+
+                    else -> logger.debug(logTag, "Session state: $state")
+                }
             }
         }
 
