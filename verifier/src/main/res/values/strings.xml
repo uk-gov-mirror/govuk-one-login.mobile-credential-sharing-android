@@ -12,4 +12,8 @@
     <string name="searching_for_uuids">Searching for UUIDs:</string>
     <string name="successfully_scanned_qr_code_data">Successfully scanned QR code data:</string>
     <string name="try_again">Try again</string>
+
+    <string name="bluetooth_connection_error_title">There was a problem with your connection</string>
+    <string name="bluetooth_connection_error_body">Your connection with the person checking your document is not working.\n\nYou’ll need to show them a new QR code to set up a new connection.\n\nNothing has been shared.</string>
+    <string name="bluetooth_connection_error_try_again">Try again with a new QR code</string>
 </resources>
