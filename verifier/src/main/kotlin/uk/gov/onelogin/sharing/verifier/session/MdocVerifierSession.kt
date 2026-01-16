@@ -62,7 +62,7 @@ class MdocVerifierSession(
 
     override fun stop() {
         logger.debug(logTag, "Stop session")
-        _state.value = VerifierSessionState.Stopped
+        gattClientManager.disconnect()
     }
 
     private fun handleGattClientEvents(event: GattClientEvent) {
@@ -80,6 +80,10 @@ class MdocVerifierSession(
                     ClientError.INVALID_SERVICE -> VerifierSessionState.Invalid
                     else -> VerifierSessionState.Error(event.error.toString())
                 }
+            }
+
+            GattClientEvent.ConnectionStateStarted -> {
+                _state.value = VerifierSessionState.ConnectionStateStarted
             }
 
             is GattClientEvent.UnsupportedEvent -> {

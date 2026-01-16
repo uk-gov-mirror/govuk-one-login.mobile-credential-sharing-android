@@ -19,5 +19,6 @@ data class ConnectWithHolderDeviceState(
     val engagementData: DeviceEngagementDto? = null,
     val hasAllPermissions: Boolean = false,
     val hasRequestedPermissions: Boolean = false,
-    val showErrorScreen: ConnectWithHolderDeviceError = ConnectWithHolderDeviceError.NoError
+    val connectionStateStarted: Boolean = false,
+    val previouslyHadPermissions: Boolean = false
 )

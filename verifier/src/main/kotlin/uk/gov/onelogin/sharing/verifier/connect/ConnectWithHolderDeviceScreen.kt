@@ -30,7 +30,6 @@ import uk.gov.android.ui.theme.spacingSingle
 import uk.gov.logging.testdouble.SystemLogger
 import uk.gov.onelogin.sharing.bluetooth.EnableBluetoothPrompt
 import uk.gov.onelogin.sharing.bluetooth.api.permissions.PermissionChecker
-import uk.gov.onelogin.sharing.bluetooth.permissions.BluetoothPermissionPrompt
 import uk.gov.onelogin.sharing.core.R as coreR
 import uk.gov.onelogin.sharing.core.UUIDExtensions.toUUID
 import uk.gov.onelogin.sharing.security.cbor.decodeDeviceEngagement
@@ -51,30 +50,32 @@ fun ConnectWithHolderDeviceScreen(
     },
     onConnectionError: (ConnectWithHolderDeviceError) -> Unit = {}
 ) {
-    viewModel.receive(ConnectWithHolderDeviceEvent.UpdateEngagementData(base64EncodedEngagement))
+    val latestOnConnectionError by rememberUpdatedState(onConnectionError)
+
     val contentState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Box(modifier = modifier.fillMaxSize()) {
-        BluetoothPermissionPrompt(
-            multiplePermissionsState,
-            contentState.hasRequestedPermissions
-        ) {
-            when (contentState.showErrorScreen) {
-                ConnectWithHolderDeviceError.BluetoothConfigurationError,
-                ConnectWithHolderDeviceError.GenericError -> {
-                    onConnectionError(contentState.showErrorScreen)
-                }
+    LaunchedEffect(base64EncodedEngagement) {
+        viewModel.receive(
+            ConnectWithHolderDeviceEvent.UpdateEngagementData(base64EncodedEngagement)
+        )
+    }
 
-                else -> {
-                    ConnectWithHolderDeviceScreenContent(
-                        contentState = contentState,
-                        multiplePermissionsState = multiplePermissionsState,
-                        modifier = Modifier,
-                        onSendEvent = viewModel::receive
-                    )
-                }
+    LaunchedEffect(Unit) {
+        viewModel.navEvents.collect {
+            when (it) {
+                is ConnectWithHolderDeviceNavEvent.NavigateToError ->
+                    latestOnConnectionError(it.error)
             }
         }
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        ConnectWithHolderDeviceScreenContent(
+            contentState = contentState,
+            multiplePermissionsState = multiplePermissionsState,
+            modifier = Modifier,
+            onSendEvent = viewModel::receive
+        )
     }
 }
 

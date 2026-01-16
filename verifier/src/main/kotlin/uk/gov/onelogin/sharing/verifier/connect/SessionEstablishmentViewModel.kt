@@ -3,20 +3,27 @@
 package uk.gov.onelogin.sharing.verifier.connect
 
 import android.bluetooth.BluetoothDevice
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
-import dev.zacsweers.metro.Inject
-import dev.zacsweers.metro.binding
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
+import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import dev.zacsweers.metrox.viewmodel.ViewModelScope
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -42,29 +49,93 @@ import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceEvent.Upd
 import uk.gov.onelogin.sharing.verifier.session.VerifierSessionFactory
 import uk.gov.onelogin.sharing.verifier.session.VerifierSessionState
 
-@Inject
-@ViewModelKey(SessionEstablishmentViewModel::class)
-@ContributesIntoMap(ViewModelScope::class, binding = binding<ViewModel>())
+@Suppress("LongParameterList")
+@AssistedInject
 class SessionEstablishmentViewModel(
     private val bluetoothAdapterProvider: BluetoothAdapterProvider,
     verifierSessionFactory: VerifierSessionFactory,
     private val scanner: BluetoothScanner,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val logger: Logger,
-    private val bluetoothStatusMonitor: BluetoothStateMonitor
+    private val bluetoothStatusMonitor: BluetoothStateMonitor,
+    @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel(),
     Receiver<ConnectWithHolderDeviceEvent> {
-
-    private val _uiState = MutableStateFlow(ConnectWithHolderDeviceState())
+    private val initialState = ConnectWithHolderDeviceState(
+        previouslyHadPermissions = savedStateHandle[PREVIOUSLY_HAD_PERMISSIONS_KEY] ?: false
+    )
+    private val _uiState = MutableStateFlow(initialState)
     val uiState: StateFlow<ConnectWithHolderDeviceState> = _uiState
+
+    private val _navEvents = MutableSharedFlow<ConnectWithHolderDeviceNavEvent>(
+        extraBufferCapacity = 1
+    )
+    val navEvents: SharedFlow<ConnectWithHolderDeviceNavEvent> = _navEvents
+
     private var scannerJob: Job? = null
     val mdocVerifierSession = verifierSessionFactory.create(viewModelScope)
+
+    @AssistedFactory
+    @ViewModelAssistedFactoryKey(SessionEstablishmentViewModel::class)
+    @ContributesIntoMap(ViewModelScope::class)
+    interface Factory : ViewModelAssistedFactory {
+        fun create(@Assisted savedStateHandle: SavedStateHandle): SessionEstablishmentViewModel
+
+        override fun create(extras: CreationExtras): SessionEstablishmentViewModel {
+            val savedStateHandle = extras.createSavedStateHandle()
+            return create(savedStateHandle)
+        }
+    }
 
     init {
         updateState {
             it.copy(
                 isBluetoothEnabled = bluetoothAdapterProvider.isEnabled()
             )
+        }
+
+        viewModelScope.launch {
+            mdocVerifierSession.state.collect { sessionState ->
+                when (sessionState) {
+                    is VerifierSessionState.Invalid ->
+                        _navEvents.tryEmit(
+                            ConnectWithHolderDeviceNavEvent.NavigateToError(
+                                ConnectWithHolderDeviceError.BluetoothConfigurationError
+                            )
+                        )
+
+                    is VerifierSessionState.Error ->
+                        _navEvents.tryEmit(
+                            ConnectWithHolderDeviceNavEvent.NavigateToError(
+                                ConnectWithHolderDeviceError.GenericError
+                            )
+                        )
+
+                    is VerifierSessionState.Connected ->
+                        updateState {
+                            it.copy(
+                                connectionStateStarted = true
+                            )
+                        }
+
+                    is VerifierSessionState.Disconnected -> {
+                        logger.debug(logTag, "Bluetooth connection dropped")
+                        val started = _uiState.value.connectionStateStarted
+                        if (started) {
+                            mdocVerifierSession.stop()
+                        }
+                        _navEvents.tryEmit(
+                            ConnectWithHolderDeviceNavEvent.NavigateToError(
+                                ConnectWithHolderDeviceError.BluetoothConnectionError
+                            )
+                        )
+                    }
+
+                    else -> Unit
+                }
+
+                logger.debug(logTag, "Session state: $sessionState")
+            }
         }
 
         bluetoothStatusMonitor.start()
@@ -87,7 +158,16 @@ class SessionEstablishmentViewModel(
                                 isBluetoothEnabled = false
                             )
                         }
-                        logger.debug(logTag, "Bluetooth turned off")
+
+                        _navEvents.tryEmit(
+                            ConnectWithHolderDeviceNavEvent.NavigateToError(
+                                ConnectWithHolderDeviceError.BluetoothDisabledError
+                            )
+                        )
+
+                        mdocVerifierSession.stop()
+
+                        logger.debug(logTag, "Bluetooth turned off during session")
                     }
 
                     else -> Unit
@@ -97,22 +177,6 @@ class SessionEstablishmentViewModel(
     }
 
     private fun connect(device: BluetoothDevice, serviceUuid: ByteArray) {
-        mdocVerifierSession.state.value.let { sessionState ->
-            when (sessionState) {
-                is VerifierSessionState.Invalid ->
-                    ConnectWithHolderDeviceError.BluetoothConfigurationError
-
-                is VerifierSessionState.Error ->
-                    ConnectWithHolderDeviceError.GenericError
-
-                else -> ConnectWithHolderDeviceError.NoError
-            }.let { error ->
-                updateState { it.copy(showErrorScreen = error) }
-            }
-
-            logger.debug(logTag, "Session state: $sessionState")
-        }
-
         mdocVerifierSession.connect(device, serviceUuid.toUUID())
     }
 
@@ -146,10 +210,6 @@ class SessionEstablishmentViewModel(
 
     private fun scanForDevice(uuid: ByteArray) {
         scannerJob = viewModelScope.launch(dispatcher) {
-            if (!uiState.value.hasAllPermissions) {
-                return@launch
-            }
-
             try {
                 withTimeout(SCAN_PERIOD) {
                     when (val scanResult = scanner.scan(uuid).first()) {
@@ -168,9 +228,11 @@ class SessionEstablishmentViewModel(
                         }
 
                         is ScanEvent.ScanFailed -> {
-                            updateState {
-                                it.copy(showErrorScreen = ConnectWithHolderDeviceError.GenericError)
-                            }
+                            _navEvents.tryEmit(
+                                ConnectWithHolderDeviceNavEvent.NavigateToError(
+                                    ConnectWithHolderDeviceError.GenericError
+                                )
+                            )
                             logger.debug(logTag, "Scan failed: ${scanResult.failure}")
                         }
                     }
@@ -215,21 +277,44 @@ class SessionEstablishmentViewModel(
     }
 
     private fun updatePermissions(state: MultiplePermissionsState) {
+        val hadPermissionsPreviously = _uiState.value.previouslyHadPermissions
+        val hasAllPerms = state.allPermissionsGranted
+        val shouldShowError = hadPermissionsPreviously && !hasAllPerms
+        val grantedPermissionsForFirstTime = !hadPermissionsPreviously && hasAllPerms
+
         updateState {
-            it.copy(hasAllPermissions = state.allPermissionsGranted)
+            it.copy(hasAllPermissions = hasAllPerms)
         }
         when {
-            state.allPermissionsGranted -> "All required Bluetooth permissions have been granted"
+            hasAllPerms -> "All required Bluetooth permissions have been granted"
             state.isPermanentlyDenied() -> "Bluetooth permissions were permanently denied"
             else -> "Bluetooth permissions were denied"
         }.let { logger.debug(logTag, it) }
+
+        if (grantedPermissionsForFirstTime) {
+            savedStateHandle[PREVIOUSLY_HAD_PERMISSIONS_KEY] = true
+        }
+
+        if (shouldShowError) {
+            logger.debug(logTag, "Bluetooth app permissions revoked during session")
+            _navEvents.tryEmit(
+                ConnectWithHolderDeviceNavEvent.NavigateToError(
+                    ConnectWithHolderDeviceError.BluetoothPermissionsError
+                )
+            )
+
+            mdocVerifierSession.stop()
+        }
     }
 
-    fun updateState(updatedState: (ConnectWithHolderDeviceState) -> ConnectWithHolderDeviceState) {
+    private fun updateState(
+        updatedState: (ConnectWithHolderDeviceState) -> ConnectWithHolderDeviceState
+    ) {
         _uiState.update(updatedState)
     }
 
     companion object {
         const val SCAN_PERIOD = 15_000L
+        const val PREVIOUSLY_HAD_PERMISSIONS_KEY = "previouslyHadPermissions"
     }
 }
