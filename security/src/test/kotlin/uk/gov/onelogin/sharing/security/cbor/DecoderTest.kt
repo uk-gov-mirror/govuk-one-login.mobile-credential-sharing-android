@@ -138,4 +138,18 @@ class DecoderTest {
         assertTrue(exception is IllegalArgumentException)
         assert(exception.message!!.contains(CborErrors.PARSING_ERROR.errorMessage))
     }
+
+    @Test
+    fun `should log error for valid decoded cbor with incorrect engagementData parameters`() {
+        val invalidDto = validDeviceEngagementDto.copy(
+            deviceRetrievalMethods = emptyList()
+        )
+
+        val result = decodeDeviceEngagement(invalidDto.toString(), logger)
+
+        val actualErrorMessage = outContent.toString()
+
+        assertTrue(actualErrorMessage.contains("Illegal parameter"))
+        assertNull(result)
+    }
 }
