@@ -47,6 +47,7 @@ fun MainActivityContent(
                 .waterfallPadding()
                 .padding(contentPadding)
         ) {
+            // TESTING COMMIT
             AppNavHost(
                 navController = navController,
                 startDestination = startDestination
