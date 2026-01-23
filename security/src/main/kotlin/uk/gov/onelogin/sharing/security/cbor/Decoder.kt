@@ -13,6 +13,7 @@ import uk.gov.logging.api.Logger
 import uk.gov.onelogin.sharing.core.implementation.ImplementationDetail
 import uk.gov.onelogin.sharing.core.implementation.RequiresImplementation
 import uk.gov.onelogin.sharing.core.logger.logTag
+import uk.gov.onelogin.sharing.security.cbor.decoders.DeriveUntaggedCborImpl
 import uk.gov.onelogin.sharing.security.cbor.decoders.SessionTranscriptDecoderImpl
 import uk.gov.onelogin.sharing.security.cbor.dto.DeviceEngagementDto
 import uk.gov.onelogin.sharing.security.cbor.dto.SessionEstablishmentDto
@@ -132,3 +133,6 @@ fun deriveSessionTranscript(
     cborBase64Url = cborBase64Url,
     sessionEstablishmentBytes = sessionEstablishmentBytes
 )
+
+fun deriveUntaggedCbor(tagged: ByteArray): ByteArray =
+    DeriveUntaggedCborImpl().deriveUntaggedCbor(tagged)

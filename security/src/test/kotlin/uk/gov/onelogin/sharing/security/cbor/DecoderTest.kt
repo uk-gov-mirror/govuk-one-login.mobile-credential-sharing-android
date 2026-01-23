@@ -2,7 +2,11 @@ package uk.gov.onelogin.sharing.security.cbor
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.security.InvalidKeyException
+import java.security.interfaces.ECPrivateKey
+import java.security.interfaces.ECPublicKey
 import junit.framework.TestCase.assertTrue
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import org.junit.After
 import org.junit.Assert.assertArrayEquals
@@ -14,11 +18,19 @@ import uk.gov.logging.testdouble.SystemLogger
 import uk.gov.onelogin.sharing.security.DecoderStub.INVALID_CBOR
 import uk.gov.onelogin.sharing.security.DecoderStub.VALID_ENCODED_DEVICE_ENGAGEMENT
 import uk.gov.onelogin.sharing.security.DecoderStub.validDeviceEngagementDto
+import uk.gov.onelogin.sharing.security.FakeSessionSecurity
 import uk.gov.onelogin.sharing.security.SessionEstablishmentStub.MOCK_SESSION_ESTABLISHMENT_DATA
 import uk.gov.onelogin.sharing.security.SessionEstablishmentStub.eReaderKeyHexFormat
 import uk.gov.onelogin.sharing.security.SessionEstablishmentStub.expectedSessionEstablishmentDto
 import uk.gov.onelogin.sharing.security.SessionEstablishmentStub.invalidCborMissingDataParameter
 import uk.gov.onelogin.sharing.security.SessionEstablishmentStub.invalidCborMissingEReader
+import uk.gov.onelogin.sharing.security.SessionSecurityTestStub.generateValidKeyPair
+import uk.gov.onelogin.sharing.security.SessionSecurityTestStub.generateValidUnsupportedKeyPair
+import uk.gov.onelogin.sharing.security.SessionSecurityTestStub.getSharedSecret
+import uk.gov.onelogin.sharing.security.cose.CoseKey
+import uk.gov.onelogin.sharing.security.engagement.EngagementAlgorithms.EC_ALGORITHM
+import uk.gov.onelogin.sharing.security.engagement.EngagementAlgorithms.EC_PARAMETER_SPEC
+import uk.gov.onelogin.sharing.security.toSessionEstablishment
 
 class DecoderTest {
 
@@ -151,5 +163,66 @@ class DecoderTest {
 
         assertTrue(actualErrorMessage.contains("Illegal parameter"))
         assertNull(result)
+    }
+
+    @Test
+    fun `should generate the same shared secret for for holder and verifier session`() {
+        val holderSession = FakeSessionSecurity()
+        val readerSession = FakeSessionSecurity()
+
+        val readerKeyPair = readerSession.generateEcKeyPair(EC_ALGORITHM, EC_PARAMETER_SPEC)
+        val holderKeyPair = holderSession.generateEcKeyPair(EC_ALGORITHM, EC_PARAMETER_SPEC)
+
+        val readerPrivateKey = readerSession.getSessionPrivateKey()
+        val holderPrivateKey = holderSession.getSessionPrivateKey()
+
+        val eReaderSharedSecret = getSharedSecret(
+            readerPrivateKey,
+            holderKeyPair.public as ECPublicKey
+        )
+
+        val holderSharedSecret = getSharedSecret(
+            holderPrivateKey,
+            readerKeyPair.public as ECPublicKey
+        )
+
+        assertArrayEquals(eReaderSharedSecret, holderSharedSecret)
+    }
+
+    @Test
+    fun `should throw error if unsupported curve used to create shared secret`() {
+        val readerKeyPair = generateValidKeyPair()
+        val holderKeyPair = generateValidUnsupportedKeyPair()
+
+        assertThrows(InvalidKeyException::class.java) {
+            getSharedSecret(
+                holderKeyPair?.private as ECPrivateKey,
+                readerKeyPair?.public as ECPublicKey
+            )
+        }
+        val actualErrorMessage = outContent.toString()
+
+        assert(actualErrorMessage.contains("Unable to create shared secret"))
+    }
+
+    @Test
+    fun `should use eReaderKey from sessionEstablishment model to generate shared secret`() {
+        val holderKeyPair = generateValidKeyPair()
+
+        val sessionEstablishment = decodeSessionEstablishmentModel(
+            MOCK_SESSION_ESTABLISHMENT_DATA.hexToByteArray(),
+            logger
+        ).toSessionEstablishment()
+
+        val untagReaderKey = deriveUntaggedCbor(sessionEstablishment.eReaderKey)
+
+        val eReaderKeyPublicKey = CoseKey.getEReaderKeyFromParsedCoseKey(untagReaderKey)
+
+        val sharedSecret = getSharedSecret(
+            holderKeyPair?.private as ECPrivateKey,
+            eReaderKeyPublicKey
+        )
+
+        assertNotNull(sharedSecret)
     }
 }

@@ -31,10 +31,7 @@ import uk.gov.onelogin.sharing.holder.mdoc.MdocSessionError
 import uk.gov.onelogin.sharing.holder.mdoc.MdocSessionManager
 import uk.gov.onelogin.sharing.holder.mdoc.MdocSessionState
 import uk.gov.onelogin.sharing.holder.mdoc.SessionManagerFactory
-import uk.gov.onelogin.sharing.security.cose.CoseKey
 import uk.gov.onelogin.sharing.security.engagement.Engagement
-import uk.gov.onelogin.sharing.security.engagement.EngagementAlgorithms.EC_ALGORITHM
-import uk.gov.onelogin.sharing.security.engagement.EngagementAlgorithms.EC_PARAMETER_SPEC
 import uk.gov.onelogin.sharing.security.secureArea.SessionSecurity
 
 @AssistedInject
@@ -64,10 +61,12 @@ class HolderWelcomeViewModel(
 
     init {
         viewModelScope.launch(dispatcher) {
-            val pubKey = sessionSecurity.generateEcPublicKey(EC_ALGORITHM, EC_PARAMETER_SPEC)
-            val key = pubKey?.let { CoseKey.generateCoseKey(it) }
-            if (key != null) {
-                val engagement = engagementGenerator.qrCodeEngagement(key, _uiState.value.uuid)
+            val publicKey = sessionSecurity.generateSessionPublicKey()
+            publicKey.let { coseKey ->
+                val engagement = engagementGenerator.qrCodeEngagement(
+                    coseKey,
+                    _uiState.value.uuid
+                )
                 _uiState.update { it.copy(qrData = "${Engagement.QR_CODE_SCHEME}$engagement") }
             }
         }
