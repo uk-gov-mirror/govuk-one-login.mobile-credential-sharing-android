@@ -33,7 +33,12 @@ android {
 dependencies {
     listOf(
         projects.core
-    ).forEach(::implementation)
+    ).forEach(::api)
+
+    listOf(
+        libs.com.google.test.parameter.injector,
+        libs.junit
+    ).forEach(::testFixturesApi)
 }
 
 mavenPublishingConfig {
