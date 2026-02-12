@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.orchestration.session.holder
+package uk.gov.onelogin.sharing.orchestration.session.verifier
 
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
@@ -11,24 +11,24 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.gov.logging.testdouble.SystemLogger
-import uk.gov.onelogin.sharing.orchestration.session.holder.data.HolderSessionStatesWithoutTransition
-import uk.gov.onelogin.sharing.orchestration.session.holder.data.InvalidHolderSessionStateTransitions
-import uk.gov.onelogin.sharing.orchestration.session.holder.data.ValidHolderSessionStateTransitions
 import uk.gov.onelogin.sharing.orchestration.session.matchers.StateContainerMatchers.hasCurrentState
+import uk.gov.onelogin.sharing.orchestration.session.verifier.data.InvalidVerifierSessionStateTransitions
+import uk.gov.onelogin.sharing.orchestration.session.verifier.data.ValidVerifierSessionStateTransitions
+import uk.gov.onelogin.sharing.orchestration.session.verifier.data.VerifierSessionStatesWithoutTransition
 
 @RunWith(TestParameterInjector::class)
-class HolderSessionImplTest {
+class VerifierSessionImplTest {
 
-    private var initialState: HolderSessionState = HolderSessionState.NotStarted
+    private var initialState: VerifierSessionState = VerifierSessionState.NotStarted
 
-    private val stateFlow: MutableStateFlow<HolderSessionState> by lazy {
+    private val stateFlow: MutableStateFlow<VerifierSessionState> by lazy {
         MutableStateFlow(initialState)
     }
-    private var validTransitions = validHolderTransitions
+    private var validTransitions = validVerifierTransitions
 
     private val logger = SystemLogger()
     private val session by lazy {
-        HolderSessionImpl(
+        VerifierSessionImpl(
             logger = logger,
             internalState = stateFlow,
             transitionMap = validTransitions
@@ -36,10 +36,10 @@ class HolderSessionImplTest {
     }
 
     @Test
-    @TestParameters(valuesProvider = InvalidHolderSessionStateTransitions::class)
+    @TestParameters(valuesProvider = InvalidVerifierSessionStateTransitions::class)
     fun `IllegalStateExceptions occur when performing invalid transitions`(
-        initial: HolderSessionState,
-        transition: HolderSessionState
+        initial: VerifierSessionState,
+        transition: VerifierSessionState
     ) = runTest {
         initialState = initial
         val exception = assertThrows(IllegalStateException::class.java) {
@@ -64,8 +64,8 @@ class HolderSessionImplTest {
 
     @Test
     fun `IllegalStateExceptions occur when the current state has no transitions available`(
-        @TestParameter(valuesProvider = HolderSessionStatesWithoutTransition::class)
-        state: HolderSessionState
+        @TestParameter(valuesProvider = VerifierSessionStatesWithoutTransition::class)
+        state: VerifierSessionState
     ) = runTest {
         initialState = state
         val exception = assertThrows(IllegalStateException::class.java) {
@@ -89,10 +89,10 @@ class HolderSessionImplTest {
     }
 
     @Test
-    @TestParameters(valuesProvider = ValidHolderSessionStateTransitions::class)
+    @TestParameters(valuesProvider = ValidVerifierSessionStateTransitions::class)
     fun `Can successfully transition to a valid state`(
-        initial: HolderSessionState,
-        transition: HolderSessionState
+        initial: VerifierSessionState,
+        transition: VerifierSessionState
     ) = runTest {
         initialState = initial
         session.transitionTo(transition)
@@ -110,8 +110,8 @@ class HolderSessionImplTest {
 
     @Test
     fun `Resetting the instance brings the session back to 'Not started'`() = runTest {
-        val resetLogMessage = "Cleared holder session state"
-        initialState = HolderSessionState.ProcessingResponse
+        val resetLogMessage = "Cleared verifier session state"
+        initialState = VerifierSessionState.ProcessingEngagement
         assertThat(
             session,
             hasCurrentState(initialState)
@@ -122,7 +122,7 @@ class HolderSessionImplTest {
 
         assertThat(
             session,
-            hasCurrentState(HolderSessionState.NotStarted)
+            hasCurrentState(VerifierSessionState.NotStarted)
         )
         assert(resetLogMessage in logger)
     }

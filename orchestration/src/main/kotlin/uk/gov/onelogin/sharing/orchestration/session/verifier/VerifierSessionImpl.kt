@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.orchestration.session.holder
+package uk.gov.onelogin.sharing.orchestration.session.verifier
 
 import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,31 +11,31 @@ import uk.gov.onelogin.sharing.orchestration.session.StateContainer.Transitional
 import uk.gov.onelogin.sharing.orchestration.session.StateContainer.Transitional.LogMessages.performedTransition
 
 /**
- * Implementation of [HolderSessionState] that utilises a backing [MutableStateFlow] for the
+ * Implementation of [VerifierSessionState] that utilises a backing [MutableStateFlow] for the
  * [currentState] property.
  *
  * Internally, the [transitionTo] function uses [update] instead of [MutableStateFlow.emit].
  *
- * @param internalState The [HolderSessionState] that the [currentState] begins with. Defaults to a
- * [MutableStateFlow] beginning with [HolderSessionState.NotStarted].
+ * @param internalState The [VerifierSessionState] that the [currentState] begins with.
+ * Defaults to a [MutableStateFlow] beginning with [VerifierSessionState.NotStarted].
  * @param transitionMap The [Map] of valid transitions. Used within [transitionTo]. Defaults to
- * [validHolderTransitions].
+ * [validVerifierTransitions].
  */
-class HolderSessionImpl(
+class VerifierSessionImpl(
     private val logger: Logger,
-    private val internalState: MutableStateFlow<HolderSessionState> =
-        MutableStateFlow(HolderSessionState.NotStarted),
-    private val transitionMap: HolderSessionStateTransitions = validHolderTransitions
-) : HolderSession {
+    private val internalState: MutableStateFlow<VerifierSessionState> =
+        MutableStateFlow(VerifierSessionState.NotStarted),
+    private val transitionMap: VerifierSessionStateTransitions = validVerifierTransitions
+) : VerifierSession {
 
-    override val currentState: StateFlow<HolderSessionState> = internalState
+    override val currentState: StateFlow<VerifierSessionState> = internalState
 
-    override fun getAvailableTransitions(): Set<KClass<out HolderSessionState>> =
+    override fun getAvailableTransitions(): Set<KClass<out VerifierSessionState>> =
         checkNotNull(transitionMap[currentState.value::class]) {
             cannotFindTransitions(currentState.value::class.java.simpleName)
         }
 
-    override fun update(state: HolderSessionState) {
+    override fun update(state: VerifierSessionState) {
         internalState.update { previousState ->
             state.also {
                 logger.debug(
@@ -59,10 +59,10 @@ class HolderSessionImpl(
 
     override fun reset() {
         internalState.update {
-            HolderSessionState.NotStarted.also {
+            VerifierSessionState.NotStarted.also {
                 logger.debug(
                     logTag,
-                    "Cleared holder session state"
+                    "Cleared verifier session state"
                 )
             }
         }

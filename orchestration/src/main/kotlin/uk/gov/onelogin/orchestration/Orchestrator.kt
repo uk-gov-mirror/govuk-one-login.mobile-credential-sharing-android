@@ -7,10 +7,32 @@ import uk.gov.onelogin.sharing.core.Resettable
  */
 interface Orchestrator : Resettable {
 
+    /**
+     * Begins the User journey.
+     *
+     * @param requiredPermissions The Android permissions required to successfully complete the
+     * User journey.
+     */
     fun start(requiredPermissions: Set<String>)
 
+    /**
+     * Completes the User journey.
+     *
+     * Specifically, this represents the User choosing to prematurely end the journey, as opposed to
+     * fully completing, or ending due to unrecoverable errors.
+     */
     fun cancel()
 
     interface Holder : Orchestrator
     interface Verifier : Orchestrator
+
+    /**
+     * Property bag object containing logging messages common to [Orchestrator] implementations.
+     */
+    data object LogMessages {
+        const val CANCEL_ORCHESTRATION_ERROR: String = "Cannot cancel orchestration"
+        const val CANCEL_ORCHESTRATION_SUCCESS: String = "cancel orchestration"
+        const val START_ORCHESTRATION_ERROR: String = "Cannot start orchestration"
+        const val START_ORCHESTRATION_SUCCESS: String = "start orchestration"
+    }
 }
