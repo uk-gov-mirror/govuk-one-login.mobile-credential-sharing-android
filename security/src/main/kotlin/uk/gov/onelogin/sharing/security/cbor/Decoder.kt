@@ -13,6 +13,7 @@ import uk.gov.logging.api.Logger
 import uk.gov.onelogin.sharing.core.implementation.ImplementationDetail
 import uk.gov.onelogin.sharing.core.implementation.RequiresImplementation
 import uk.gov.onelogin.sharing.core.logger.logTag
+import uk.gov.onelogin.sharing.security.cbor.CborErrors.DECODING_ERROR
 import uk.gov.onelogin.sharing.security.cbor.decoders.DeriveUntaggedCborImpl
 import uk.gov.onelogin.sharing.security.cbor.decoders.SessionTranscriptDecoderImpl
 import uk.gov.onelogin.sharing.security.cbor.dto.DeviceEngagementDto
@@ -99,7 +100,7 @@ fun decodeSessionEstablishmentModel(rawBytes: ByteArray, logger: Logger): Sessio
 
         val rawDto = mapper.readValue(rawBytes, SessionEstablishmentDto::class.java)
         requireNotNull(rawDto) {
-            CborErrors.DECODING_ERROR.errorMessage
+            DECODING_ERROR.errorMessage
         }
 
         val sessionEstablishmentDto = SessionEstablishmentDto(
