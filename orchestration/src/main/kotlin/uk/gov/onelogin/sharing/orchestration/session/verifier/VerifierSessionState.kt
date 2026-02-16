@@ -1,5 +1,6 @@
 package uk.gov.onelogin.sharing.orchestration.session.verifier
 
+import uk.gov.onelogin.sharing.core.Completable
 import uk.gov.onelogin.sharing.orchestration.session.DeviceResponse
 import uk.gov.onelogin.sharing.orchestration.session.SessionError
 
@@ -7,7 +8,10 @@ import uk.gov.onelogin.sharing.orchestration.session.SessionError
  * Represents a digital credential verification journey's state for validating another device's
  * digital credentials.
  */
-sealed class VerifierSessionState {
+sealed class VerifierSessionState : Completable {
+
+    override fun isComplete(): Boolean = this is Complete
+
     /**
      * Null-value object declaring that a User hasn't started a digital credential verification
      * journey yet.

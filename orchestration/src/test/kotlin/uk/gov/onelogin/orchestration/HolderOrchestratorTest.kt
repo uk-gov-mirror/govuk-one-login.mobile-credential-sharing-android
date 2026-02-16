@@ -12,32 +12,45 @@ import uk.gov.onelogin.sharing.orchestration.OrchestratorStubs.LogMessages.CANCE
 import uk.gov.onelogin.sharing.orchestration.OrchestratorStubs.LogMessages.CANCEL_ORCHESTRATION_SUCCESS
 import uk.gov.onelogin.sharing.orchestration.OrchestratorStubs.LogMessages.START_ORCHESTRATION_ERROR
 import uk.gov.onelogin.sharing.orchestration.OrchestratorStubs.LogMessages.START_ORCHESTRATION_SUCCESS
+import uk.gov.onelogin.sharing.orchestration.session.FakeSessionFactory
+import uk.gov.onelogin.sharing.orchestration.session.holder.HolderSession
 import uk.gov.onelogin.sharing.orchestration.session.holder.HolderSessionImpl
 import uk.gov.onelogin.sharing.orchestration.session.holder.HolderSessionState
 import uk.gov.onelogin.sharing.orchestration.session.holder.data.CancellableHolderSessionStates
+import uk.gov.onelogin.sharing.orchestration.session.holder.data.CompleteHolderSessionStates
 import uk.gov.onelogin.sharing.orchestration.session.holder.data.UncancellableHolderSessionStates
 import uk.gov.onelogin.sharing.orchestration.session.holder.matchers.HolderSessionStateMatchers.inPreflight
 import uk.gov.onelogin.sharing.orchestration.session.holder.matchers.HolderSessionStateMatchers.isCancelled
-import uk.gov.onelogin.sharing.orchestration.session.matchers.StateContainerMatchers.hasCurrentState
+import uk.gov.onelogin.sharing.orchestration.session.holder.matchers.HolderSessionStateMatchers.isNotStarted
+import uk.gov.onelogin.sharing.orchestration.session.matchers.FakeSessionFactoryMatchers.currentSessionState
 
 @RunWith(TestParameterInjector::class)
 class HolderOrchestratorTest {
     private val logger = SystemLogger()
     private val resetOrchestratorSessionLog = "Cleared Orchestrator holder session"
+    private val startSessionAfterCompletionLog =
+        "Starting an Orchestrator holder session after completing the previous journey"
 
-    private var initialState: HolderSessionState = HolderSessionState.NotStarted
+    private var initialStates: MutableList<HolderSessionState> = mutableListOf(
+        HolderSessionState.NotStarted,
+        HolderSessionState.NotStarted
+    )
 
-    private val session by lazy {
-        HolderSessionImpl(
-            logger = logger,
-            internalState = MutableStateFlow(initialState)
+    private val sessionFactory by lazy {
+        FakeSessionFactory<HolderSession>(
+            initialStates.map { initialState ->
+                HolderSessionImpl(
+                    logger = logger,
+                    internalState = MutableStateFlow(initialState)
+                )
+            }
         )
     }
 
     private val orchestrator by lazy {
         HolderOrchestrator(
             logger = logger,
-            session = session
+            sessionFactory = sessionFactory
         )
     }
 
@@ -49,21 +62,39 @@ class HolderOrchestratorTest {
         assert(START_ORCHESTRATION_ERROR !in logger)
 
         assertThat(
-            session,
-            hasCurrentState(inPreflight())
+            sessionFactory,
+            currentSessionState(inPreflight())
         )
     }
 
     @Test
-    fun `Orchestrator cannot be started more than once`() = runTest {
+    fun `Starting the Orchestrator journey is possible when the journey is already complete`(
+        @TestParameter(valuesProvider = CompleteHolderSessionStates::class)
+        state: HolderSessionState
+    ) = runTest {
+        initialStates[0] = state
+        orchestrator.start(setOf())
+
+        assert(startSessionAfterCompletionLog in logger)
+        assert(START_ORCHESTRATION_SUCCESS in logger)
+        assert(START_ORCHESTRATION_ERROR !in logger)
+
+        assertThat(
+            sessionFactory,
+            currentSessionState(inPreflight())
+        )
+    }
+
+    @Test
+    fun `Orchestrator cannot be started when the User journey is already in progress`() = runTest {
         `Starting the Orchestrator journey navigates to the Preflight state`()
 
         orchestrator.start(setOf())
 
         assert(START_ORCHESTRATION_ERROR in logger)
         assertThat(
-            session,
-            hasCurrentState(inPreflight())
+            sessionFactory,
+            currentSessionState(inPreflight())
         )
     }
 
@@ -72,14 +103,14 @@ class HolderOrchestratorTest {
         @TestParameter(valuesProvider = UncancellableHolderSessionStates::class)
         state: HolderSessionState
     ) = runTest {
-        initialState = state
+        initialStates[0] = state
         orchestrator.cancel()
 
         assert(CANCEL_ORCHESTRATION_ERROR in logger)
         assert(CANCEL_ORCHESTRATION_SUCCESS !in logger)
         assertThat(
-            session,
-            hasCurrentState(state)
+            sessionFactory,
+            currentSessionState(state)
         )
     }
 
@@ -88,14 +119,14 @@ class HolderOrchestratorTest {
         @TestParameter(valuesProvider = CancellableHolderSessionStates::class)
         state: HolderSessionState
     ) = runTest {
-        initialState = state
+        initialStates[0] = state
         orchestrator.cancel()
 
         assert(CANCEL_ORCHESTRATION_SUCCESS in logger)
         assert(CANCEL_ORCHESTRATION_ERROR !in logger)
         assertThat(
-            session,
-            hasCurrentState(isCancelled())
+            sessionFactory,
+            currentSessionState(isCancelled())
         )
     }
 
@@ -107,8 +138,8 @@ class HolderOrchestratorTest {
 
         assert(resetOrchestratorSessionLog in logger)
         assertThat(
-            session,
-            hasCurrentState(HolderSessionState.NotStarted)
+            sessionFactory,
+            currentSessionState(isNotStarted())
         )
     }
 }

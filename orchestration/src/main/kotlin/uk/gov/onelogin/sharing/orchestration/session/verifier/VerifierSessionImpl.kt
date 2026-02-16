@@ -30,6 +30,8 @@ class VerifierSessionImpl(
 
     override val currentState: StateFlow<VerifierSessionState> = internalState
 
+    override fun isComplete(): Boolean = currentState.value.isComplete()
+
     override fun getAvailableTransitions(): Set<KClass<out VerifierSessionState>> =
         checkNotNull(transitionMap[currentState.value::class]) {
             cannotFindTransitions(currentState.value::class.java.simpleName)
@@ -55,16 +57,5 @@ class VerifierSessionImpl(
             CANNOT_COMPLETE_TRANSITION,
             throwable
         )
-    }
-
-    override fun reset() {
-        internalState.update {
-            VerifierSessionState.NotStarted.also {
-                logger.debug(
-                    logTag,
-                    "Cleared verifier session state"
-                )
-            }
-        }
     }
 }

@@ -11,7 +11,7 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.gov.logging.testdouble.SystemLogger
-import uk.gov.onelogin.sharing.orchestration.session.holder.data.HolderSessionStatesWithoutTransition
+import uk.gov.onelogin.sharing.orchestration.session.holder.data.CompleteHolderSessionStates
 import uk.gov.onelogin.sharing.orchestration.session.holder.data.InvalidHolderSessionStateTransitions
 import uk.gov.onelogin.sharing.orchestration.session.holder.data.ValidHolderSessionStateTransitions
 import uk.gov.onelogin.sharing.orchestration.session.matchers.StateContainerMatchers.hasCurrentState
@@ -64,7 +64,7 @@ class HolderSessionImplTest {
 
     @Test
     fun `IllegalStateExceptions occur when the current state has no transitions available`(
-        @TestParameter(valuesProvider = HolderSessionStatesWithoutTransition::class)
+        @TestParameter(valuesProvider = CompleteHolderSessionStates::class)
         state: HolderSessionState
     ) = runTest {
         initialState = state
@@ -106,24 +106,5 @@ class HolderSessionImplTest {
             "Transitioned from '${initial::class.java.simpleName}' to " +
                 "'${transition::class.java.simpleName}'" in logger
         )
-    }
-
-    @Test
-    fun `Resetting the instance brings the session back to 'Not started'`() = runTest {
-        val resetLogMessage = "Cleared holder session state"
-        initialState = HolderSessionState.ProcessingResponse
-        assertThat(
-            session,
-            hasCurrentState(initialState)
-        )
-
-        assert(resetLogMessage !in logger)
-        session.reset()
-
-        assertThat(
-            session,
-            hasCurrentState(HolderSessionState.NotStarted)
-        )
-        assert(resetLogMessage in logger)
     }
 }

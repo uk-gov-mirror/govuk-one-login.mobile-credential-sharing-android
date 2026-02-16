@@ -12,9 +12,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import uk.gov.logging.testdouble.SystemLogger
 import uk.gov.onelogin.sharing.orchestration.session.matchers.StateContainerMatchers.hasCurrentState
+import uk.gov.onelogin.sharing.orchestration.session.verifier.data.CompleteVerifierSessionStates
 import uk.gov.onelogin.sharing.orchestration.session.verifier.data.InvalidVerifierSessionStateTransitions
 import uk.gov.onelogin.sharing.orchestration.session.verifier.data.ValidVerifierSessionStateTransitions
-import uk.gov.onelogin.sharing.orchestration.session.verifier.data.VerifierSessionStatesWithoutTransition
 
 @RunWith(TestParameterInjector::class)
 class VerifierSessionImplTest {
@@ -64,7 +64,7 @@ class VerifierSessionImplTest {
 
     @Test
     fun `IllegalStateExceptions occur when the current state has no transitions available`(
-        @TestParameter(valuesProvider = VerifierSessionStatesWithoutTransition::class)
+        @TestParameter(valuesProvider = CompleteVerifierSessionStates::class)
         state: VerifierSessionState
     ) = runTest {
         initialState = state
@@ -106,24 +106,5 @@ class VerifierSessionImplTest {
             "Transitioned from '${initial::class.java.simpleName}' to " +
                 "'${transition::class.java.simpleName}'" in logger
         )
-    }
-
-    @Test
-    fun `Resetting the instance brings the session back to 'Not started'`() = runTest {
-        val resetLogMessage = "Cleared verifier session state"
-        initialState = VerifierSessionState.ProcessingEngagement
-        assertThat(
-            session,
-            hasCurrentState(initialState)
-        )
-
-        assert(resetLogMessage !in logger)
-        session.reset()
-
-        assertThat(
-            session,
-            hasCurrentState(VerifierSessionState.NotStarted)
-        )
-        assert(resetLogMessage in logger)
     }
 }
