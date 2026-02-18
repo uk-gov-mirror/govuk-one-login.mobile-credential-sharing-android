@@ -267,6 +267,7 @@ class SessionEstablishmentViewModel(
 
     override fun onCleared() {
         logger.debug(logTag, "VM cleared, stopping scanner")
+        mdocVerifierSession.stop()
         receive(StopScanning)
         super.onCleared()
     }

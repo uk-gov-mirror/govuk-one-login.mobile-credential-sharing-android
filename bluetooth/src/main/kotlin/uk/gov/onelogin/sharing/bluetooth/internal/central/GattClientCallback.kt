@@ -49,4 +49,18 @@ internal class GattClientCallback(private val gattEventEmitter: GattClientEventE
             )
         )
     }
+
+    override fun onCharacteristicChanged(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        value: ByteArray
+    ) {
+        gattEventEmitter.emit(
+            GattEvent.CharacteristicChanged(
+                gatt = gatt,
+                characteristic = characteristic,
+                value = value
+            )
+        )
+    }
 }
