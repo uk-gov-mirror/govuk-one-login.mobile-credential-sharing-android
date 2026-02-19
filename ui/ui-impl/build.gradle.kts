@@ -33,8 +33,10 @@ android {
 dependencies {
     listOf(
         libs.metro.viewmodel.compose,
+        projects.holder,
         projects.sdk,
-        projects.ui.uiApi
+        projects.ui.uiApi,
+        projects.verifier
     ).forEach(::implementation)
 }
 

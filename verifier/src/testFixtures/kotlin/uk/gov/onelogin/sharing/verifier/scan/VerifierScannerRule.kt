@@ -5,8 +5,6 @@ import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.test.assert
@@ -24,13 +22,12 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasFlags
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
-import dev.zacsweers.metro.createGraphFactory
-import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
 import org.hamcrest.CoreMatchers.allOf
 import uk.gov.android.ui.componentsv2.matchers.SemanticsMatchers.hasRole
-import uk.gov.onelogin.sharing.di.CredentialSharingAppGraph
+import uk.gov.onelogin.sharing.core.presentation.ButtonTestTags.PERMISSION_PERMANENT_DENIAL_BUTTON
+import uk.gov.onelogin.sharing.core.presentation.ButtonTestTags.PERMISSION_RATIONALE_BUTTON
+import uk.gov.onelogin.sharing.core.presentation.ButtonTestTags.PERMISSION_REQUIRED_BUTTON
 import uk.gov.onelogin.sharing.verifier.R
-import uk.gov.onelogin.sharing.verifier.di.VerifierGraph
 import uk.gov.onelogin.sharing.verifier.scan.BarcodeAnalysisUrlContractAssertions.hasState
 
 /**
@@ -39,10 +36,8 @@ import uk.gov.onelogin.sharing.verifier.scan.BarcodeAnalysisUrlContractAssertion
  */
 class VerifierScannerRule(
     composeTestRule: ComposeContentTestRule,
-    private val appGraph: CredentialSharingAppGraph,
     private val openAppSettingsText: String,
-    private val permissionDeniedText: String,
-    private val permissionGrantedText: String
+    private val permissionDeniedText: String
 ) : ComposeContentTestRule by composeTestRule {
 
     /**
@@ -50,14 +45,11 @@ class VerifierScannerRule(
      */
     constructor(
         composeTestRule: ComposeContentTestRule,
-        appGraph: CredentialSharingAppGraph,
         resources: Resources = ApplicationProvider.getApplicationContext<Context>().resources
     ) : this(
         composeTestRule = composeTestRule,
-        appGraph = appGraph,
         openAppSettingsText = resources.getString(R.string.open_app_permissions),
-        permissionDeniedText = resources.getString(R.string.enable_camera_permission_to_continue),
-        permissionGrantedText = resources.getString(R.string.camera_permission_is_enabled)
+        permissionDeniedText = resources.getString(R.string.enable_camera_permission_to_continue)
     )
 
     fun assertCameraViewfinderIsDisplayed() = onCameraViewfinder().assertIsDisplayed()
@@ -72,9 +64,15 @@ class VerifierScannerRule(
 
     fun assertOpenAppSettingsButtonIsDisplayed() = onOpenAppSettingsButton().assertIsDisplayed()
 
+    fun assertPermissionPermanentlyDeniedButtonIsDisplayed() =
+        onPermissionPermanentlyDeniedButton().assertIsDisplayed()
+
     fun assertPermissionDeniedButtonIsDisplayed() = onPermissionDeniedButton().assertIsDisplayed()
 
-    fun assertPermissionGrantedTextIsDisplayed() = onPermissionGrantedText().assertIsDisplayed()
+    fun assertPermissionRationaleButtonIsDisplayed() =
+        onPermissionRationaleButton().assertIsDisplayed()
+
+    fun assertPermissionDeniedTextIsDisplayed() = onPermissionDeniedText().assertIsDisplayed()
 
     fun onCameraViewfinder() = onNodeWithTag("cameraViewfinder").assertExists()
 
@@ -83,13 +81,25 @@ class VerifierScannerRule(
         .assert(hasRole(Role.Button))
         .assertHasClickAction()
 
-    fun onPermissionDeniedButton() = onNodeWithText(permissionDeniedText)
-        .assertExists()
+    fun onPermissionPermanentlyDeniedButton() = onNodeWithTag(
+        PERMISSION_PERMANENT_DENIAL_BUTTON
+    ).assertExists()
         .assert(hasRole(Role.Button))
         .assertHasClickAction()
 
-    fun onPermissionGrantedText() = onNodeWithText(permissionGrantedText)
-        .assertExists()
+    fun onPermissionDeniedButton() = onNodeWithTag(
+        PERMISSION_REQUIRED_BUTTON
+    ).assertExists()
+        .assert(hasRole(Role.Button))
+        .assertHasClickAction()
+
+    fun onPermissionRationaleButton() = onNodeWithTag(
+        PERMISSION_RATIONALE_BUTTON
+    ).assertExists()
+        .assert(hasRole(Role.Button))
+        .assertHasClickAction()
+
+    fun onPermissionDeniedText() = onNodeWithText(permissionDeniedText).assertIsDisplayed()
 
     fun performOpenAppSettingsClick() = onOpenAppSettingsButton().performClick().also {
         intended(
@@ -101,7 +111,7 @@ class VerifierScannerRule(
         )
     }
 
-    fun performPermissionDeniedClick() = onPermissionDeniedButton().performClick()
+    fun performPermissionDeniedClick() = onPermissionPermanentlyDeniedButton().performClick()
 
     /**
      * Due to issues with the metro dependency injection framework's compiler, don't use this
@@ -115,22 +125,12 @@ class VerifierScannerRule(
         onValidBarcode: (String) -> Unit = {}
     ) {
         setContent {
-            val graph = remember {
-                createGraphFactory<VerifierGraph.Factory>().create(
-                    appGraph = appGraph
-                )
-            }
-
-            CompositionLocalProvider(
-                LocalMetroViewModelFactory provides graph.metroViewModelFactory
-            ) {
-                VerifierScanner(
-                    modifier = modifier,
-                    permissionState = permissionState(),
-                    onInvalidBarcode = onInvalidBarcode,
-                    onValidBarcode = onValidBarcode
-                )
-            }
+            VerifierScanner(
+                modifier = modifier,
+                permissionState = permissionState(),
+                onInvalidBarcode = onInvalidBarcode,
+                onValidBarcode = onValidBarcode
+            )
         }
     }
 }

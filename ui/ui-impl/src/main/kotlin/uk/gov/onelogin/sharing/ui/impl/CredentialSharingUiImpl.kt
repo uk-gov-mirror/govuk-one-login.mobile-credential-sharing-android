@@ -1,6 +1,5 @@
 package uk.gov.onelogin.sharing.ui.impl
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -41,7 +40,9 @@ class CredentialSharingUiImpl : CredentialSharingUi {
         CompositionLocalProvider(
             LocalMetroViewModelFactory provides uiGraph.metroViewModelFactory
         ) {
-            Text("Hello World!")
+            CredentialSharingUiNavHost(
+                startDestination = startDestination
+            )
         }
     }
 }

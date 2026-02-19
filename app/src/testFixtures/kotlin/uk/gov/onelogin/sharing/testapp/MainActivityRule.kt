@@ -1,91 +1,79 @@
 package uk.gov.onelogin.sharing.testapp
 
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.test.SemanticsNodeInteraction
-import androidx.compose.ui.test.assertCountEquals
+import android.content.Context
+import android.content.res.Resources
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasParent
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
-import androidx.navigation.compose.ComposeNavigator
-import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
 import uk.gov.onelogin.sharing.di.CredentialSharingAppGraph
-import uk.gov.onelogin.sharing.testapp.destination.PrimaryTabDestination
 
 class MainActivityRule(
+    private val appGraph: CredentialSharingAppGraph,
     composeTestRule: ComposeContentTestRule,
-    private val appGraph: CredentialSharingAppGraph
+    private val holderText: String,
+    private val verifierText: String
 ) : ComposeContentTestRule by composeTestRule {
 
-    private lateinit var controller: TestNavHostController
-    private val lazyColumnTestTag = "menuItems"
+    constructor(
+        composeTestRule: ComposeContentTestRule,
+        appGraph: CredentialSharingAppGraph,
+        resources: Resources = ApplicationProvider.getApplicationContext<Context>().resources
+    ) : this(
+        composeTestRule = composeTestRule,
+        appGraph = appGraph,
+        holderText = resources.getString(R.string.holder),
+        verifierText = resources.getString(R.string.verifier)
+    )
 
-    fun assertMenuItem(menuText: String): SemanticsNodeInteraction {
-        onNodeWithTag(lazyColumnTestTag)
-            .performScrollToNode(hasText(menuText))
+    fun render() {
+        setContent {
+            Content(appGraph)
+        }
+    }
 
-        return onNode(
-            hasParent(hasTestTag(lazyColumnTestTag)) and hasText(menuText)
-        ).assertExists()
-            .assertIsDisplayed()
+    @Composable
+    fun Content(appGraph: CredentialSharingAppGraph) {
+        TestAppScreen(
+            ui = FakeCredentialSharingUi(),
+            sdk = FakeCredentialSharingSdk(appGraph)
+        )
+    }
+
+    fun assertHolderIsDisplayed() {
+        onNodeWithText(holderText).isDisplayed()
+    }
+
+    fun assertVerifierIsDisplayed() {
+        onNodeWithText(verifierText).isDisplayed()
+    }
+
+    fun openHolder() {
+        onNodeWithText(holderText)
+            .assertExists()
             .assertHasClickAction()
+            .performClick()
     }
 
-    fun assertMenuItemsCount(expected: Int) = onAllNodes(
-        hasParent(hasTestTag(lazyColumnTestTag))
-    ).assertCountEquals(expected)
-
-    fun performHolderTabClick() = onNodeWithText("Holder")
-        .assertIsDisplayed()
-        .assertHasClickAction()
-        .performClick()
-
-    fun performMenuItemClick(textToClick: String) = assertMenuItem(textToClick).performClick()
-
-    fun performVerifierTabClick() = onNodeWithText("Verifier")
-        .assertIsDisplayed()
-        .assertHasClickAction()
-        .performClick()
-
-    fun render(
-        currentTabDestination: PrimaryTabDestination,
-        startDestination: Any,
-        onUpdateTabDestination: (PrimaryTabDestination) -> Unit = {}
-    ) {
-        setContent {
-            controller = TestNavHostController(LocalContext.current).apply {
-                navigatorProvider.addNavigator(ComposeNavigator())
-            }
-
-            MainActivityContentUi(
-                currentTab = currentTabDestination,
-                onSelectTab = { destination: PrimaryTabDestination ->
-                    controller.navigate(destination)
-                    onUpdateTabDestination(destination)
-                },
-                navHost = { hostModifier ->
-                    AppNavHost(
-                        appGraph = appGraph,
-                        startDestination = startDestination,
-                        modifier = hostModifier,
-                        navController = controller
-                    )
-                }
-            )
-        }
+    fun assertSharingDialogIsDisplayed() {
+        onNodeWithTag(SHARING_DIALOG_TAG)
+            .assertExists()
+            .assertIsDisplayed()
     }
 
-    fun renderPreview(currentTabDestination: PrimaryTabDestination) {
-        setContent {
-            MainActivityContentUiPreview(
-                currentTabDestination = currentTabDestination
-            )
-        }
+    fun closeSharingDialog() {
+        onNodeWithTag(CLOSE_DIALOG_BUTTON_TAG)
+            .assertExists()
+            .assertHasClickAction()
+            .performClick()
+    }
+
+    fun assertSharingDialogDoesNotExist() {
+        onNodeWithTag(SHARING_DIALOG_TAG).assertDoesNotExist()
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.toRoute
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -14,8 +15,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceRoute
-import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceRoute.Companion.configureConnectWithHolderDeviceRoute
-import uk.gov.onelogin.sharing.verifier.di.createTestGraph
 import uk.gov.onelogin.sharing.verifier.scan.errors.invalid.ScannedInvalidQrRoute.Companion.configureScannedInvalidQrRoute
 import uk.gov.onelogin.sharing.verifier.scan.errors.invalid.ScannedInvalidQrRoute.Companion.navigateToScannedInvalidQrRoute
 import uk.gov.onelogin.sharing.verifier.scan.state.data.BarcodeDataResultStubs.invalidBarcodeDataResultOne
@@ -65,8 +64,8 @@ class ScannedInvalidQrRouteTest {
                 navController = controller,
                 startDestination = ConnectWithHolderDeviceRoute(validBarcodeDataResult.data)
             ) {
-                configureConnectWithHolderDeviceRoute(appGraph = createTestGraph())
-                configureScannedInvalidQrRoute()
+                composable<ConnectWithHolderDeviceRoute> {}
+                composable<ScannedInvalidQrRoute> {}
             }
 
             controller.navigateToScannedInvalidQrRoute(invalidBarcodeDataResultOne.data)

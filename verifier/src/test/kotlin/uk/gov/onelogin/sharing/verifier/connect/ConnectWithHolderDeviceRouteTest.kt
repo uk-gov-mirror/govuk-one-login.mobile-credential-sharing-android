@@ -4,6 +4,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
 import androidx.navigation.toRoute
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -14,11 +15,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
-import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceRoute.Companion.configureConnectWithHolderDeviceRoute
 import uk.gov.onelogin.sharing.verifier.connect.ConnectWithHolderDeviceStateStubs.validWithCorrectBluetoothSetup
-import uk.gov.onelogin.sharing.verifier.di.createTestGraph
 import uk.gov.onelogin.sharing.verifier.rules.ShadowLogFile
-import uk.gov.onelogin.sharing.verifier.scan.errors.invalid.ScannedInvalidQrRoute.Companion.configureScannedInvalidQrRoute
+import uk.gov.onelogin.sharing.verifier.scan.errors.invalid.ScannedInvalidQrRoute
 
 @RunWith(AndroidJUnit4::class)
 @Config(
@@ -47,8 +46,8 @@ class ConnectWithHolderDeviceRouteTest {
                     validWithCorrectBluetoothSetup.base64EncodedEngagement!!
                 )
             ) {
-                configureConnectWithHolderDeviceRoute(appGraph = createTestGraph())
-                configureScannedInvalidQrRoute()
+                composable<ConnectWithHolderDeviceRoute> {}
+                composable<ScannedInvalidQrRoute> {}
             }
         }
 
