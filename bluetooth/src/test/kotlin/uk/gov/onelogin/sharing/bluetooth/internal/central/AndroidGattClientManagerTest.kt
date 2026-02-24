@@ -504,7 +504,7 @@ internal class AndroidGattClientManagerTest {
             )
 
             assertEquals(
-                GattClientEvent.Disconnected(bluetoothGatt.device.address),
+                GattClientEvent.Disconnected(bluetoothGatt.device.address, false),
                 awaitItem()
             )
         }

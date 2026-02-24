@@ -160,7 +160,7 @@ class AndroidGattServerManagerTest {
             )
 
             assertEquals(
-                GattServerEvent.Disconnected(DEVICE_ADDRESS),
+                GattServerEvent.Disconnected(DEVICE_ADDRESS, false),
                 awaitItem()
             )
 
