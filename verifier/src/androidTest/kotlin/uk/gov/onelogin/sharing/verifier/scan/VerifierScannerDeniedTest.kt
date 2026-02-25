@@ -9,12 +9,13 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.gov.android.ui.componentsv2.camera.qr.BarcodeScanResult
+import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalPermissionsApi::class)
@@ -37,7 +38,9 @@ class VerifierScannerDeniedTest {
             composeTestRule.setContent {
                 VerifierScannerContent(
                     lifecycleOwner = LocalLifecycleOwner.current,
-                    permissionState = rememberPermissionState(Manifest.permission.CAMERA),
+                    permissionState = rememberMultiplePermissionsState(
+                        centralPermissions() + Manifest.permission.CAMERA
+                    ),
                     hasPreviouslyDeniedPermission = true,
                     onUpdatePreviouslyDeniedPermission = {},
                     barcodeScanResultCallback = BarcodeScanResult.Callback { _, _ -> }

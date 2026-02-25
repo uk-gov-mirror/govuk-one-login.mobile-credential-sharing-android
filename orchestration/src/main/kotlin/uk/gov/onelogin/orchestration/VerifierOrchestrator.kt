@@ -1,5 +1,6 @@
 package uk.gov.onelogin.orchestration
 
+import android.Manifest
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
@@ -8,11 +9,15 @@ import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATI
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATION_SUCCESS
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_ERROR
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_SUCCESS
+import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.completedAuthorizationCheck
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.createSessionResetMessage
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.recreateSessionOnStartMessage
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotCancelException
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotStartException
+import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
 import uk.gov.onelogin.sharing.core.logger.logTag
+import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteGate
+import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationRequest
 import uk.gov.onelogin.sharing.orchestration.session.SessionFactory
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSession
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState
@@ -20,12 +25,13 @@ import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionSta
 @ContributesBinding(scope = AppScope::class, binding = binding<Orchestrator.Verifier>())
 class VerifierOrchestrator(
     private val logger: Logger,
-    private val sessionFactory: SessionFactory<VerifierSession>
+    private val sessionFactory: SessionFactory<VerifierSession>,
+    private val authorizationGate: PrerequisiteGate.Authorization
 ) : Orchestrator.Verifier {
 
     private var session: VerifierSession = sessionFactory.create()
 
-    override fun start(requiredPermissions: Set<String>) {
+    override fun start() {
         if (session.isComplete()) {
             session = sessionFactory.create().also {
                 logger.debug(
@@ -35,11 +41,31 @@ class VerifierOrchestrator(
             }
         }
 
+        val requiredPermissions = centralPermissions() + Manifest.permission.CAMERA
+
         try {
             session.transitionTo(
-                VerifierSessionState.Preflight(requiredPermissions)
-            )
-            logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
+                VerifierSessionState.Preflight(
+                    requiredPermissions.toSet()
+                )
+            ).also {
+                logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
+            }
+
+            // future work: Authorization occurs within a capability check
+            authorizationGate.checkAuthorization(
+                AuthorizationRequest.AuthorizePermission(
+                    requiredPermissions
+                )
+            ).also {
+                logger.debug(
+                    logTag,
+                    completedAuthorizationCheck(
+                        Orchestrator.Verifier.JOURNEY_NAME,
+                        it
+                    )
+                )
+            }
         } catch (exception: IllegalStateException) {
             START_ORCHESTRATION_ERROR.let { logMessage ->
                 logger.error(

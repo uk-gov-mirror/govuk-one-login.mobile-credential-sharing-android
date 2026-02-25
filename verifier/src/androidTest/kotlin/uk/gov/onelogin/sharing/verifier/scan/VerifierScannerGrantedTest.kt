@@ -9,12 +9,14 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.gov.android.ui.componentsv2.camera.qr.BarcodeScanResult
+import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
+import uk.gov.onelogin.sharing.core.PermissionListExtensions.toGrantPermissionsRule
 
 @OptIn(ExperimentalPermissionsApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -24,9 +26,9 @@ class VerifierScannerGrantedTest {
         ApplicationProvider.getApplicationContext<Context>().resources
 
     @get:Rule
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.CAMERA
-    )
+    val grantPermissionRule: GrantPermissionRule = (
+        centralPermissions() + Manifest.permission.CAMERA
+        ).toGrantPermissionsRule()
 
     @get:Rule
     val composeTestRule = VerifierScannerRule(
@@ -42,7 +44,9 @@ class VerifierScannerGrantedTest {
                     lifecycleOwner = LocalLifecycleOwner.current,
                     onUpdatePreviouslyDeniedPermission = {},
                     hasPreviouslyDeniedPermission = false,
-                    permissionState = rememberPermissionState(Manifest.permission.CAMERA),
+                    permissionState = rememberMultiplePermissionsState(
+                        centralPermissions() + Manifest.permission.CAMERA
+                    ),
                     barcodeScanResultCallback = { _, _ -> }
                 )
             }
@@ -59,7 +63,9 @@ class VerifierScannerGrantedTest {
                     lifecycleOwner = LocalLifecycleOwner.current,
                     hasPreviouslyDeniedPermission = false,
                     onUpdatePreviouslyDeniedPermission = {},
-                    permissionState = rememberPermissionState(Manifest.permission.CAMERA),
+                    permissionState = rememberMultiplePermissionsState(
+                        centralPermissions() + Manifest.permission.CAMERA
+                    ),
                     barcodeScanResultCallback = BarcodeScanResult.Callback { _, _ -> }
                 )
             }

@@ -30,7 +30,7 @@ class HolderOrchestrator(
 
     private var session: HolderSession = sessionFactory.create()
 
-    override fun start(requiredPermissions: Set<String>) {
+    override fun start() {
         if (session.isComplete()) {
             session = sessionFactory.create().also {
                 logger.debug(
@@ -40,16 +40,20 @@ class HolderOrchestrator(
             }
         }
 
+        val requiredPermissions = peripheralPermissions().toSet()
+
         try {
             session.transitionTo(
-                HolderSessionState.Preflight(requiredPermissions)
+                HolderSessionState.Preflight(
+                    requiredPermissions
+                )
             )
             logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
 
             // future work: Authorization occurs within a capability check
             authorizationGate.checkAuthorization(
                 AuthorizationRequest.AuthorizePermission(
-                    peripheralPermissions()
+                    requiredPermissions.toList()
                 )
             ).also {
                 logger.debug(

@@ -67,7 +67,7 @@ class HolderOrchestratorTest {
 
     @Test
     fun `Starting the Orchestrator journey navigates to the Preflight state`() = runTest {
-        orchestrator.start(setOf())
+        orchestrator.start()
 
         assert(START_ORCHESTRATION_SUCCESS in logger)
         assert(START_ORCHESTRATION_ERROR !in logger)
@@ -90,7 +90,7 @@ class HolderOrchestratorTest {
         state: HolderSessionState
     ) = runTest {
         initialStates[0] = state
-        orchestrator.start(setOf())
+        orchestrator.start()
 
         assert(startSessionAfterCompletionLog in logger)
         assert(START_ORCHESTRATION_SUCCESS in logger)
@@ -112,7 +112,7 @@ class HolderOrchestratorTest {
     fun `Orchestrator cannot be started when the User journey is already in progress`() = runTest {
         `Starting the Orchestrator journey navigates to the Preflight state`()
 
-        orchestrator.start(setOf())
+        orchestrator.start()
 
         assert(START_ORCHESTRATION_ERROR in logger)
         assertThat(

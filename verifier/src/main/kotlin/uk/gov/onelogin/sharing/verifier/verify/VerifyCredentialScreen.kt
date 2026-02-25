@@ -1,5 +1,6 @@
 package uk.gov.onelogin.sharing.verifier.verify
 
+import android.Manifest
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,7 +21,7 @@ import uk.gov.onelogin.sharing.bluetooth.permissions.BluetoothPermissionPrompt
 fun VerifyCredentialScreen(
     viewModel: VerifyCredentialViewModel = metroViewModel(),
     multiplePermissionsState: MultiplePermissionsState = rememberMultiplePermissionsState(
-        permissions = centralPermissions()
+        permissions = centralPermissions() + Manifest.permission.CAMERA
 
     ) {
         viewModel.onPermissionRequestLaunched()

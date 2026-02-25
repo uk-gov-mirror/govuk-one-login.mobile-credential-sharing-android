@@ -14,6 +14,8 @@ import uk.gov.onelogin.sharing.orchestration.OrchestratorStubs.LogMessages.CANCE
 import uk.gov.onelogin.sharing.orchestration.OrchestratorStubs.LogMessages.CANCEL_ORCHESTRATION_SUCCESS
 import uk.gov.onelogin.sharing.orchestration.OrchestratorStubs.LogMessages.START_ORCHESTRATION_ERROR
 import uk.gov.onelogin.sharing.orchestration.OrchestratorStubs.LogMessages.START_ORCHESTRATION_SUCCESS
+import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationResponse
+import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.FakePrerequisiteAuthorizationGate
 import uk.gov.onelogin.sharing.orchestration.session.FakeSessionFactory
 import uk.gov.onelogin.sharing.orchestration.session.matchers.FakeSessionFactoryMatchers.currentSessionState
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSession
@@ -49,10 +51,19 @@ class VerifierOrchestratorTest {
         )
     }
 
+    private var authorizationResponse = AuthorizationResponse.Authorized
+
+    private val permissionChecker by lazy {
+        FakePrerequisiteAuthorizationGate(
+            authorizationResponse
+        )
+    }
+
     private val orchestrator by lazy {
         VerifierOrchestrator(
             logger = logger,
-            sessionFactory = sessionFactory
+            sessionFactory = sessionFactory,
+            authorizationGate = permissionChecker
         )
     }
 
@@ -66,7 +77,7 @@ class VerifierOrchestratorTest {
 
     @Test
     fun `Starting the Orchestrator journey navigates to the Preflight state`() = runTest {
-        orchestrator.start(setOf())
+        orchestrator.start()
 
         assert(START_ORCHESTRATION_SUCCESS in logger)
         assert(START_ORCHESTRATION_ERROR !in logger)
@@ -74,6 +85,12 @@ class VerifierOrchestratorTest {
         assertThat(
             sessionFactory,
             currentSessionState(inPreflight())
+        )
+
+        assert(
+            logger.any { entry ->
+                entry.message.contains(authorizationResponse.toString())
+            }
         )
     }
 
@@ -83,7 +100,7 @@ class VerifierOrchestratorTest {
         state: VerifierSessionState
     ) = runTest {
         initialStates[0] = state
-        orchestrator.start(setOf())
+        orchestrator.start()
 
         assert(startSessionAfterCompletionLog in logger)
         assert(START_ORCHESTRATION_SUCCESS in logger)
@@ -93,13 +110,19 @@ class VerifierOrchestratorTest {
             sessionFactory,
             currentSessionState(inPreflight())
         )
+
+        assert(
+            logger.any { entry ->
+                entry.message.contains(authorizationResponse.toString())
+            }
+        )
     }
 
     @Test
     fun `Orchestrator cannot be started more than once`() = runTest {
         `Starting the Orchestrator journey navigates to the Preflight state`()
 
-        orchestrator.start(setOf())
+        orchestrator.start()
 
         assert(START_ORCHESTRATION_ERROR in logger)
         assertThat(

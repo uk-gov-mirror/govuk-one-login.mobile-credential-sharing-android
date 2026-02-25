@@ -10,11 +10,8 @@ interface Orchestrator : Resettable {
 
     /**
      * Begins the User journey.
-     *
-     * @param requiredPermissions The Android permissions required to successfully complete the
-     * User journey.
      */
-    fun start(requiredPermissions: Set<String>)
+    fun start()
 
     /**
      * Completes the User journey.

@@ -8,10 +8,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import uk.gov.android.ui.componentsv2.camera.qr.BarcodeScanResult
+import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
 import uk.gov.onelogin.sharing.verifier.scan.callbacks.VerifierScannerBarcodeScanCallback
 import uk.gov.onelogin.sharing.verifier.scan.state.data.BarcodeDataResult
 
@@ -21,9 +22,12 @@ fun VerifierScanner(
     modifier: Modifier = Modifier,
     viewModel: VerifierScannerViewModel = metroViewModel(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    permissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA) {
-        viewModel.update(!it)
-    },
+    permissionState: MultiplePermissionsState =
+        rememberMultiplePermissionsState(
+            permissions = centralPermissions() + Manifest.permission.CAMERA
+        ) { permissionMap ->
+            viewModel.update(permissionMap.values.all { it })
+        },
     onInvalidBarcode: (String) -> Unit = {},
     onValidBarcode: (String) -> Unit = {}
 ) {
