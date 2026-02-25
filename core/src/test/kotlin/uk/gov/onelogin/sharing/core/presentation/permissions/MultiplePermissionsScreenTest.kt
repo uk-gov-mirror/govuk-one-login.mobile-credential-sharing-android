@@ -37,11 +37,11 @@ class MultiplePermissionsScreenTest {
             },
             onPermanentlyDenyPermission = { fail(permanentlyDeniedUnhappyPathFailure) },
             onRequirePermission = { _, launchPermission -> fail(deniedUnhappyPathFailure) },
-            onShowRationale = { _, launchPermission -> fail(rationaleUnhappyPathFailure) },
+            onShowRationale = { _, launchPermission -> fail(rationaleUnhappyPathFailure) }
         ),
         state = FakeMultiplePermissionsState(
             permission.toFakePermissionState(PermissionStatus.Granted)
-        ),
+        )
     )
 
     @Test
@@ -52,7 +52,7 @@ class MultiplePermissionsScreenTest {
             onRequirePermission = { _, launchPermission -> fail(deniedUnhappyPathFailure) },
             onShowRationale = { _, launchPermission ->
                 hasReachedHappyPath = true
-            },
+            }
         ),
         state = FakeMultiplePermissionsState(
             permission.toFakePermissionState(
@@ -60,7 +60,7 @@ class MultiplePermissionsScreenTest {
                     shouldShowRationale = true
                 )
             )
-        ),
+        )
     )
 
     @Test
@@ -71,7 +71,7 @@ class MultiplePermissionsScreenTest {
             onRequirePermission = { _, launchPermission ->
                 hasReachedHappyPath = true
             },
-            onShowRationale = { _, launchPermission -> fail(rationaleUnhappyPathFailure) },
+            onShowRationale = { _, launchPermission -> fail(rationaleUnhappyPathFailure) }
         ),
         state = FakeMultiplePermissionsState(
             permission.toFakePermissionState(
@@ -79,7 +79,7 @@ class MultiplePermissionsScreenTest {
                     shouldShowRationale = false
                 )
             )
-        ),
+        )
     )
 
     @Test
@@ -90,9 +90,9 @@ class MultiplePermissionsScreenTest {
                 hasReachedHappyPath = true
             },
             onRequirePermission = { _, launchPermission -> fail(deniedUnhappyPathFailure) },
-            onShowRationale = { _, launchPermission -> fail(rationaleUnhappyPathFailure) },
+            onShowRationale = { _, launchPermission -> fail(rationaleUnhappyPathFailure) }
 
-            ),
+        ),
         hasPreviouslyDeniedPermission = true,
         state = FakeMultiplePermissionsState(
             permission.toFakePermissionState(
@@ -100,7 +100,7 @@ class MultiplePermissionsScreenTest {
                     shouldShowRationale = false
                 )
             )
-        ),
+        )
     )
 
     @Test
@@ -111,7 +111,7 @@ class MultiplePermissionsScreenTest {
             onRequirePermission = { _, launchPermission ->
                 launchPermission()
             },
-            onShowRationale = { _, launchPermission -> fail(rationaleUnhappyPathFailure) },
+            onShowRationale = { _, launchPermission -> fail(rationaleUnhappyPathFailure) }
         ),
         state = FakeMultiplePermissionsState(
             permission.toFakePermissionState(
@@ -121,7 +121,7 @@ class MultiplePermissionsScreenTest {
             )
         ) {
             hasReachedHappyPath = true
-        },
+        }
     )
 
     @Test
@@ -132,7 +132,7 @@ class MultiplePermissionsScreenTest {
             onRequirePermission = { _, launchPermission -> fail(deniedUnhappyPathFailure) },
             onShowRationale = { _, launchPermission ->
                 launchPermission()
-            },
+            }
         ),
         state = FakeMultiplePermissionsState(
             permission.toFakePermissionState(
@@ -142,23 +142,22 @@ class MultiplePermissionsScreenTest {
             )
         ) {
             hasReachedHappyPath = true
-        },
+        }
     )
 
     private fun performLogicFlow(
         logic: MultiplePermissionsLogic,
         state: MultiplePermissionsState,
-        hasPreviouslyDeniedPermission: Boolean = false,
+        hasPreviouslyDeniedPermission: Boolean = false
     ) = runTest {
         composeTestRule.setContent {
             MultiplePermissionsScreen(
                 state = state,
                 hasPreviouslyRequestedPermission = hasPreviouslyDeniedPermission,
-                logic = logic,
+                logic = logic
             )
         }
 
         assertTrue(hasReachedHappyPath)
     }
-
 }

@@ -11,6 +11,6 @@ object FakePermissionStateExt {
     ): FakePermissionState = FakePermissionState(
         permission = this,
         status = status,
-        onLaunchPermission = onLaunchPermission,
+        onLaunchPermission = onLaunchPermission
     )
 }

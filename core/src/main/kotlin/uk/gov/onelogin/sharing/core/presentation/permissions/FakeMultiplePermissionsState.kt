@@ -16,15 +16,15 @@ import com.google.accompanist.permissions.shouldShowRationale
 @OptIn(ExperimentalPermissionsApi::class)
 class FakeMultiplePermissionsState(
     override val permissions: List<PermissionState>,
-    private val onLaunchPermission: () -> Unit = {},
+    private val onLaunchPermission: () -> Unit = {}
 ) : MultiplePermissionsState {
 
     constructor(
         vararg permissions: PermissionState,
-        onLaunchPermission: () -> Unit = {},
+        onLaunchPermission: () -> Unit = {}
     ) : this(
         permissions = permissions.toList(),
-        onLaunchPermission = onLaunchPermission,
+        onLaunchPermission = onLaunchPermission
     )
 
     override val allPermissionsGranted: Boolean
