@@ -1,6 +1,5 @@
 package uk.gov.onelogin.sharing.verifier.scan
 
-import android.Manifest
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -12,7 +11,7 @@ import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import dev.zacsweers.metrox.viewmodel.metroViewModel
 import uk.gov.android.ui.componentsv2.camera.qr.BarcodeScanResult
-import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
+import uk.gov.onelogin.orchestration.Orchestrator.Verifier.Companion.requiredPermissions
 import uk.gov.onelogin.sharing.verifier.scan.callbacks.VerifierScannerBarcodeScanCallback
 import uk.gov.onelogin.sharing.verifier.scan.state.data.BarcodeDataResult
 
@@ -24,7 +23,7 @@ fun VerifierScanner(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     permissionState: MultiplePermissionsState =
         rememberMultiplePermissionsState(
-            permissions = centralPermissions() + Manifest.permission.CAMERA
+            permissions = requiredPermissions
         ) { permissionMap ->
             viewModel.update(permissionMap.values.all { it })
         },

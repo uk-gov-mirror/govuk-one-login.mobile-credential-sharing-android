@@ -1,6 +1,5 @@
 package uk.gov.onelogin.sharing.verifier.scan
 
-import android.Manifest
 import android.content.Context
 import android.content.res.Resources
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -15,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.gov.android.ui.componentsv2.camera.qr.BarcodeScanResult
-import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
+import uk.gov.onelogin.orchestration.Orchestrator.Verifier.Companion.requiredPermissions
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalPermissionsApi::class)
@@ -39,7 +38,7 @@ class VerifierScannerDeniedTest {
                 VerifierScannerContent(
                     lifecycleOwner = LocalLifecycleOwner.current,
                     permissionState = rememberMultiplePermissionsState(
-                        centralPermissions() + Manifest.permission.CAMERA
+                        requiredPermissions
                     ),
                     hasPreviouslyDeniedPermission = true,
                     onUpdatePreviouslyDeniedPermission = {},

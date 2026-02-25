@@ -1,6 +1,5 @@
 package uk.gov.onelogin.sharing.verifier.scan
 
-import android.Manifest
 import android.content.Context
 import android.content.res.Resources
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -15,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.gov.android.ui.componentsv2.camera.qr.BarcodeScanResult
-import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
+import uk.gov.onelogin.orchestration.Orchestrator.Verifier.Companion.requiredPermissions
 import uk.gov.onelogin.sharing.core.PermissionListExtensions.toGrantPermissionsRule
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -26,9 +25,7 @@ class VerifierScannerGrantedTest {
         ApplicationProvider.getApplicationContext<Context>().resources
 
     @get:Rule
-    val grantPermissionRule: GrantPermissionRule = (
-        centralPermissions() + Manifest.permission.CAMERA
-        ).toGrantPermissionsRule()
+    val grantPermissionRule: GrantPermissionRule = requiredPermissions.toGrantPermissionsRule()
 
     @get:Rule
     val composeTestRule = VerifierScannerRule(
@@ -45,7 +42,7 @@ class VerifierScannerGrantedTest {
                     onUpdatePreviouslyDeniedPermission = {},
                     hasPreviouslyDeniedPermission = false,
                     permissionState = rememberMultiplePermissionsState(
-                        centralPermissions() + Manifest.permission.CAMERA
+                        requiredPermissions
                     ),
                     barcodeScanResultCallback = { _, _ -> }
                 )
@@ -64,7 +61,7 @@ class VerifierScannerGrantedTest {
                     hasPreviouslyDeniedPermission = false,
                     onUpdatePreviouslyDeniedPermission = {},
                     permissionState = rememberMultiplePermissionsState(
-                        centralPermissions() + Manifest.permission.CAMERA
+                        requiredPermissions
                     ),
                     barcodeScanResultCallback = BarcodeScanResult.Callback { _, _ -> }
                 )

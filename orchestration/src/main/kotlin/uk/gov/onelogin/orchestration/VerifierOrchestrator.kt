@@ -1,6 +1,5 @@
 package uk.gov.onelogin.orchestration
 
-import android.Manifest
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
@@ -12,9 +11,9 @@ import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATIO
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.completedAuthorizationCheck
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.createSessionResetMessage
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.recreateSessionOnStartMessage
+import uk.gov.onelogin.orchestration.Orchestrator.Verifier.Companion.requiredPermissions
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotCancelException
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotStartException
-import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
 import uk.gov.onelogin.sharing.core.logger.logTag
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteGate
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationRequest
@@ -40,8 +39,6 @@ class VerifierOrchestrator(
                 )
             }
         }
-
-        val requiredPermissions = centralPermissions() + Manifest.permission.CAMERA
 
         try {
             session.transitionTo(
