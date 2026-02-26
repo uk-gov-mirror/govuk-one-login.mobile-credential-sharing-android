@@ -25,7 +25,7 @@ sealed class VerifierSessionState : Completable {
      * @param missingPermissions The list of permissions required to perform the journey in it's
      * entirety.
      */
-    data class Preflight(val missingPermissions: Set<String>) : VerifierSessionState()
+    data object Preflight : VerifierSessionState()
 
     /**
      * The User's completed the [Preflight] validations, so the device is ready to

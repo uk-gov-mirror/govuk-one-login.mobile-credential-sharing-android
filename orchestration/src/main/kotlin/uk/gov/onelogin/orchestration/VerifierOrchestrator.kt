@@ -41,11 +41,7 @@ class VerifierOrchestrator(
         }
 
         try {
-            session.transitionTo(
-                VerifierSessionState.Preflight(
-                    requiredPermissions.toSet()
-                )
-            ).also {
+            session.transitionTo(VerifierSessionState.Preflight).also {
                 logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
             }
 

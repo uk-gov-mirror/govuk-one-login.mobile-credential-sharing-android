@@ -5,10 +5,10 @@ import com.google.testing.junit.testparameterinjector.TestParametersValuesProvid
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.Connecting
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.NotStarted
+import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.Preflight
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.ProcessingEngagement
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.ReadyToScan
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.Verifying
-import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionStateStubs.preflightEmptyPermissions
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionStateStubs.successStub
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionStateStubs.userCancellation
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionStateStubs.userJourneyFailure
@@ -43,17 +43,17 @@ class InvalidVerifierSessionStateTransitions : TestParametersValuesProvider() {
 
         private val preflightTransitions = listOf(
             NotStarted,
-            preflightEmptyPermissions,
+            Preflight,
             Connecting,
             ProcessingEngagement,
             Verifying,
             successStub
         ).map {
-            preflightEmptyPermissions to it
+            Preflight to it
         }
         private val readyToScanTransitions = listOf(
             NotStarted,
-            preflightEmptyPermissions,
+            Preflight,
             ReadyToScan,
             ProcessingEngagement,
             Verifying,
@@ -63,7 +63,7 @@ class InvalidVerifierSessionStateTransitions : TestParametersValuesProvider() {
         }
         private val connectingTransitions = listOf(
             NotStarted,
-            preflightEmptyPermissions,
+            Preflight,
             ReadyToScan,
             Connecting,
             Verifying,
@@ -73,7 +73,7 @@ class InvalidVerifierSessionStateTransitions : TestParametersValuesProvider() {
         }
         private val processingEngagementTransitions = listOf(
             NotStarted,
-            preflightEmptyPermissions,
+            Preflight,
             ReadyToScan,
             Connecting,
             ProcessingEngagement,
@@ -83,7 +83,7 @@ class InvalidVerifierSessionStateTransitions : TestParametersValuesProvider() {
         }
         private val VerifyingTransitions = listOf(
             NotStarted,
-            preflightEmptyPermissions,
+            Preflight,
             ReadyToScan,
             Connecting,
             ProcessingEngagement

@@ -5,10 +5,10 @@ import com.google.testing.junit.testparameterinjector.TestParametersValuesProvid
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.Connecting
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.NotStarted
+import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.Preflight
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.ProcessingEngagement
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.ReadyToScan
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState.Verifying
-import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionStateStubs.preflightEmptyPermissions
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionStateStubs.successStub
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionStateStubs.userCancellation
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionStateStubs.userJourneyFailure
@@ -25,7 +25,7 @@ class ValidVerifierSessionStateTransitions : TestParametersValuesProvider() {
 
     companion object {
         private val notStartedTransitions = listOf(
-            "Verifier session begins initialising" to preflightEmptyPermissions
+            "Verifier session begins initialising" to VerifierSessionState.Preflight
         ).map { (testName, transition) ->
             Triple(
                 testName,
@@ -40,7 +40,7 @@ class ValidVerifierSessionStateTransitions : TestParametersValuesProvider() {
         ).map { (testName, transition) ->
             Triple(
                 testName,
-                preflightEmptyPermissions,
+                Preflight,
                 transition
             )
         }
