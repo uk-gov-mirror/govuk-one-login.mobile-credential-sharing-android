@@ -1,11 +1,17 @@
 package uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.matchers
 
+import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.Matcher
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationResponse
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.UnauthorizedReason
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.matchers.UnauthorizedReasonMatchers.isMissingPermissions
 
 object AuthorizationResponseMatchers {
+
+    fun isAuthorized(): Matcher<AuthorizationResponse> = instanceOf(
+        AuthorizationResponse.Authorized::class.java
+    )
+
     fun hasUnauthorizedPermissions(
         matcher: Matcher<in Iterable<String>>
     ): Matcher<AuthorizationResponse> = hasUnauthorizedReason(

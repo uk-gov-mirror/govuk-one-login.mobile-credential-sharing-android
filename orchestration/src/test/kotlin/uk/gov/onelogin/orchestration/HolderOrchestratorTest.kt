@@ -21,8 +21,11 @@ import uk.gov.onelogin.sharing.orchestration.holder.session.data.UncancellableHo
 import uk.gov.onelogin.sharing.orchestration.holder.session.matchers.HolderSessionStateMatchers.inPreflight
 import uk.gov.onelogin.sharing.orchestration.holder.session.matchers.HolderSessionStateMatchers.isCancelled
 import uk.gov.onelogin.sharing.orchestration.holder.session.matchers.HolderSessionStateMatchers.isNotStarted
+import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
+import uk.gov.onelogin.sharing.orchestration.prerequisites.StubPrerequisiteGate
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationResponse
-import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.FakePrerequisiteAuthorizationGate
+import uk.gov.onelogin.sharing.orchestration.prerequisites.capability.CapabilityResponse
+import uk.gov.onelogin.sharing.orchestration.prerequisites.readiness.ReadinessResponse
 import uk.gov.onelogin.sharing.orchestration.session.FakeSessionFactory
 import uk.gov.onelogin.sharing.orchestration.session.matchers.FakeSessionFactoryMatchers.currentSessionState
 
@@ -51,9 +54,17 @@ class HolderOrchestratorTest {
 
     private var authorizationResponse = AuthorizationResponse.Authorized
 
-    private val permissionChecker by lazy {
-        FakePrerequisiteAuthorizationGate(
-            authorizationResponse
+    private var gateResponses = listOf(
+        PrerequisiteResponse(
+            authorizationResponse = authorizationResponse,
+            capabilityResponse = CapabilityResponse.Capable,
+            readinessResponse = ReadinessResponse.Ready
+        )
+    )
+
+    private val gate by lazy {
+        StubPrerequisiteGate(
+            responses = gateResponses
         )
     }
 
@@ -61,7 +72,7 @@ class HolderOrchestratorTest {
         HolderOrchestrator(
             logger = logger,
             sessionFactory = sessionFactory,
-            authorizationGate = permissionChecker
+            prerequisiteGate = gate
         )
     }
 
@@ -75,12 +86,6 @@ class HolderOrchestratorTest {
         assertThat(
             sessionFactory,
             currentSessionState(inPreflight())
-        )
-
-        assert(
-            logger.any { entry ->
-                entry.message.contains(authorizationResponse.toString())
-            }
         )
     }
 
@@ -99,12 +104,6 @@ class HolderOrchestratorTest {
         assertThat(
             sessionFactory,
             currentSessionState(inPreflight())
-        )
-
-        assert(
-            logger.any { entry ->
-                entry.message.contains(authorizationResponse.toString())
-            }
         )
     }
 

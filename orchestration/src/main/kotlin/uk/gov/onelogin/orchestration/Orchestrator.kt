@@ -5,15 +5,12 @@ import kotlinx.coroutines.flow.SharedFlow
 import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
 import uk.gov.onelogin.sharing.core.Resettable
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
-import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationResponse
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState
 
 /**
  * Implements [Resettable] for clearing internal state, such as the session state machines.
  */
-interface Orchestrator <State : Any> : Resettable {
-
-    val sessionState: SharedFlow<State>
+interface Orchestrator : Resettable {
 
     /**
      * Begins the User journey.
@@ -28,12 +25,16 @@ interface Orchestrator <State : Any> : Resettable {
      */
     fun cancel()
 
-    interface Holder : Orchestrator<HolderSessionState> {
+    interface Holder : Orchestrator {
+        val holderSessionState: SharedFlow<HolderSessionState>
+
         companion object {
             const val JOURNEY_NAME: String = "holder"
         }
     }
-    interface Verifier : Orchestrator<VerifierSessionState> {
+    interface Verifier : Orchestrator {
+        val verifierSessionState: SharedFlow<VerifierSessionState>
+
         companion object {
             const val JOURNEY_NAME: String = "verifier"
             val requiredPermissions: List<String> =
@@ -49,9 +50,6 @@ interface Orchestrator <State : Any> : Resettable {
         const val CANCEL_ORCHESTRATION_SUCCESS: String = "cancel orchestration"
         const val START_ORCHESTRATION_ERROR: String = "Cannot start orchestration"
         const val START_ORCHESTRATION_SUCCESS: String = "start orchestration"
-
-        fun completedAuthorizationCheck(journey: String, response: AuthorizationResponse): String =
-            "Performed $journey authorization check: $response"
 
         fun createSessionResetMessage(journey: String): String =
             "Cleared Orchestrator $journey session"

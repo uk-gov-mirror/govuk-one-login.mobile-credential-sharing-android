@@ -11,7 +11,7 @@ import uk.gov.onelogin.sharing.core.permission.PermissionChecker
 import uk.gov.onelogin.sharing.core.permission.StubPermissionChecker
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.matchers.AuthorizationResponseMatchers.hasUnauthorizedPermissions
 
-class AuthorizationPrerequisiteGateTest {
+class AuthorizationPrerequisiteGateLayerTest {
 
     private val logger = SystemLogger()
     private val permission = Manifest.permission.CAMERA
@@ -24,7 +24,7 @@ class AuthorizationPrerequisiteGateTest {
     }
 
     private val gate by lazy {
-        AuthorizationPrerequisiteGate(
+        AuthorizationPrerequisiteGateLayer(
             logger = logger,
             permissionChecker = permissionChecker
         )

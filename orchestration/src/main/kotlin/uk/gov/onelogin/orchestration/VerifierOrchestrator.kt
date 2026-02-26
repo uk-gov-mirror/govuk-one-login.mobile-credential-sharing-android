@@ -9,15 +9,15 @@ import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATI
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATION_SUCCESS
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_ERROR
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_SUCCESS
-import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.completedAuthorizationCheck
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.createSessionResetMessage
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.recreateSessionOnStartMessage
 import uk.gov.onelogin.orchestration.Orchestrator.Verifier.Companion.requiredPermissions
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotCancelException
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotStartException
 import uk.gov.onelogin.sharing.core.logger.logTag
+import uk.gov.onelogin.sharing.orchestration.prerequisites.Capability
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteGate
-import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationRequest
+import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteRequest
 import uk.gov.onelogin.sharing.orchestration.session.SessionFactory
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSession
 import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState
@@ -26,11 +26,11 @@ import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionSta
 class VerifierOrchestrator(
     private val logger: Logger,
     private val sessionFactory: SessionFactory<VerifierSession>,
-    private val authorizationGate: PrerequisiteGate.Authorization
+    private val prerequisiteGate: PrerequisiteGate
 ) : Orchestrator.Verifier {
 
     private var session: VerifierSession = sessionFactory.create()
-    override val sessionState: SharedFlow<VerifierSessionState> = session.currentState
+    override val verifierSessionState: SharedFlow<VerifierSessionState> = session.currentState
 
     override fun start() {
         if (session.isComplete()) {
@@ -47,20 +47,15 @@ class VerifierOrchestrator(
                 logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
             }
 
-            // future work: Authorization occurs within a capability check
-            authorizationGate.checkAuthorization(
-                AuthorizationRequest.AuthorizePermission(
-                    requiredPermissions
-                )
-            ).also {
-                logger.debug(
-                    logTag,
-                    completedAuthorizationCheck(
-                        Orchestrator.Verifier.JOURNEY_NAME,
-                        it
+            prerequisiteGate.checkPrerequisites(
+                PrerequisiteRequest.verifier(
+                    permissions = requiredPermissions,
+                    capabilities = listOf(
+                        Capability.BLUETOOTH,
+                        Capability.CAMERA
                     )
                 )
-            }
+            )
         } catch (exception: IllegalStateException) {
             START_ORCHESTRATION_ERROR.let { logMessage ->
                 logger.error(

@@ -9,7 +9,6 @@ import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATI
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATION_SUCCESS
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_ERROR
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_SUCCESS
-import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.completedAuthorizationCheck
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.createSessionResetMessage
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.recreateSessionOnStartMessage
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotCancelException
@@ -18,19 +17,20 @@ import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothPeri
 import uk.gov.onelogin.sharing.core.logger.logTag
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSession
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
+import uk.gov.onelogin.sharing.orchestration.prerequisites.Capability
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteGate
-import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationRequest
+import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteRequest
 import uk.gov.onelogin.sharing.orchestration.session.SessionFactory
 
 @ContributesBinding(scope = AppScope::class, binding = binding<Orchestrator.Holder>())
 class HolderOrchestrator(
     private val logger: Logger,
     private val sessionFactory: SessionFactory<HolderSession>,
-    private val authorizationGate: PrerequisiteGate.Authorization
+    private val prerequisiteGate: PrerequisiteGate
 ) : Orchestrator.Holder {
 
     private var session: HolderSession = sessionFactory.create()
-    override val sessionState: SharedFlow<HolderSessionState> = session.currentState
+    override val holderSessionState: SharedFlow<HolderSessionState> = session.currentState
 
     override fun start() {
         if (session.isComplete()) {
@@ -47,20 +47,12 @@ class HolderOrchestrator(
                 logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
             }
 
-            // future work: Authorization occurs within a capability check
-            authorizationGate.checkAuthorization(
-                AuthorizationRequest.AuthorizePermission(
-                    peripheralPermissions()
+            prerequisiteGate.checkPrerequisites(
+                PrerequisiteRequest.holder(
+                    permissions = peripheralPermissions(),
+                    capabilities = listOf(Capability.BLUETOOTH)
                 )
-            ).also {
-                logger.debug(
-                    logTag,
-                    completedAuthorizationCheck(
-                        Orchestrator.Holder.JOURNEY_NAME,
-                        it
-                    )
-                )
-            }
+            )
         } catch (exception: IllegalStateException) {
             START_ORCHESTRATION_ERROR.let { logMessage ->
                 logger.error(

@@ -6,16 +6,16 @@ import dev.zacsweers.metro.binding
 import uk.gov.logging.api.Logger
 import uk.gov.onelogin.sharing.core.logger.logTag
 import uk.gov.onelogin.sharing.core.permission.PermissionChecker
-import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteGate
+import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteGateLayer
 
 @ContributesBinding(
     AppScope::class,
-    binding = binding<PrerequisiteGate.Authorization>()
+    binding = binding<PrerequisiteGateLayer.AuthorizationLayer>()
 )
-class AuthorizationPrerequisiteGate(
+class AuthorizationPrerequisiteGateLayer(
     permissionChecker: PermissionChecker,
     private val logger: Logger
-) : PrerequisiteGate.Authorization,
+) : PrerequisiteGateLayer.AuthorizationLayer,
     PermissionChecker by permissionChecker {
 
     override fun checkAuthorization(request: AuthorizationRequest): AuthorizationResponse {
