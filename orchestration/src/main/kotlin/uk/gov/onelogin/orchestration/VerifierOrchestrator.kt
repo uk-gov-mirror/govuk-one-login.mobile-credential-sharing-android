@@ -3,6 +3,7 @@ package uk.gov.onelogin.orchestration
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.flow.SharedFlow
 import uk.gov.logging.api.Logger
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATION_ERROR
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATION_SUCCESS
@@ -29,6 +30,7 @@ class VerifierOrchestrator(
 ) : Orchestrator.Verifier {
 
     private var session: VerifierSession = sessionFactory.create()
+    override val sessionState: SharedFlow<VerifierSessionState> = session.currentState
 
     override fun start() {
         if (session.isComplete()) {

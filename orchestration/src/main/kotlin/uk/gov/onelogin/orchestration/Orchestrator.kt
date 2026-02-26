@@ -1,14 +1,19 @@
 package uk.gov.onelogin.orchestration
 
 import android.Manifest
+import kotlinx.coroutines.flow.SharedFlow
 import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
 import uk.gov.onelogin.sharing.core.Resettable
+import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationResponse
+import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionState
 
 /**
  * Implements [Resettable] for clearing internal state, such as the session state machines.
  */
-interface Orchestrator : Resettable {
+interface Orchestrator <State : Any> : Resettable {
+
+    val sessionState: SharedFlow<State>
 
     /**
      * Begins the User journey.
@@ -23,12 +28,12 @@ interface Orchestrator : Resettable {
      */
     fun cancel()
 
-    interface Holder : Orchestrator {
+    interface Holder : Orchestrator<HolderSessionState> {
         companion object {
             const val JOURNEY_NAME: String = "holder"
         }
     }
-    interface Verifier : Orchestrator {
+    interface Verifier : Orchestrator<VerifierSessionState> {
         companion object {
             const val JOURNEY_NAME: String = "verifier"
             val requiredPermissions: List<String> =
