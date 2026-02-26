@@ -40,21 +40,15 @@ class HolderOrchestrator(
             }
         }
 
-        val requiredPermissions = peripheralPermissions().toSet()
-
         try {
-            session.transitionTo(
-                HolderSessionState.Preflight(
-                    requiredPermissions
-                )
-            ).also {
+            session.transitionTo(HolderSessionState.Preflight).also {
                 logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
             }
 
             // future work: Authorization occurs within a capability check
             authorizationGate.checkAuthorization(
                 AuthorizationRequest.AuthorizePermission(
-                    requiredPermissions.toList()
+                    peripheralPermissions()
                 )
             ).also {
                 logger.debug(

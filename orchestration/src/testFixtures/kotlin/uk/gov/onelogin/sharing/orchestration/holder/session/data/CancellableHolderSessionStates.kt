@@ -2,7 +2,6 @@ package uk.gov.onelogin.sharing.orchestration.holder.session.data
 
 import com.google.testing.junit.testparameterinjector.TestParameterValuesProvider
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
-import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionStateStubs
 
 /**
  * Parameterised test input for valid [HolderSessionState] objects that can transition to
@@ -11,7 +10,7 @@ import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionStateSt
  */
 class CancellableHolderSessionStates : TestParameterValuesProvider() {
     override fun provideValues(context: Context?): List<*>? = listOf(
-        HolderSessionStateStubs.preflightEmptyPermissions,
+        HolderSessionState.Preflight,
         HolderSessionState.ReadyToPresent,
         HolderSessionState.PresentingEngagement,
         HolderSessionState.Connecting,

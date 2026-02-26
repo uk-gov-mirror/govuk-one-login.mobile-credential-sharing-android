@@ -36,18 +36,18 @@ class InvalidHolderSessionStateTransitions : TestParametersValuesProvider() {
 
         private val preflightTransitions = listOf(
             HolderSessionState.NotStarted,
-            HolderSessionStateStubs.preflightEmptyPermissions,
+            HolderSessionState.Preflight,
             HolderSessionState.PresentingEngagement,
             HolderSessionState.Connecting,
             HolderSessionState.RequestReceived,
             HolderSessionState.ProcessingResponse,
             HolderSessionStateStubs.successStub
         ).map {
-            HolderSessionStateStubs.preflightEmptyPermissions to it
+            HolderSessionState.Preflight to it
         }
         private val readyToPresentTransitions = listOf(
             HolderSessionState.NotStarted,
-            HolderSessionStateStubs.preflightEmptyPermissions,
+            HolderSessionState.Preflight,
             HolderSessionState.ReadyToPresent,
             HolderSessionState.Connecting,
             HolderSessionState.RequestReceived,
@@ -58,7 +58,7 @@ class InvalidHolderSessionStateTransitions : TestParametersValuesProvider() {
         }
         private val presentingEngagementTransitions = listOf(
             HolderSessionState.NotStarted,
-            HolderSessionStateStubs.preflightEmptyPermissions,
+            HolderSessionState.Preflight,
             HolderSessionState.ReadyToPresent,
             HolderSessionState.PresentingEngagement,
             HolderSessionState.RequestReceived,
@@ -70,7 +70,7 @@ class InvalidHolderSessionStateTransitions : TestParametersValuesProvider() {
         }
         private val connectingTransitions = listOf(
             HolderSessionState.NotStarted,
-            HolderSessionStateStubs.preflightEmptyPermissions,
+            HolderSessionState.Preflight,
             HolderSessionState.ReadyToPresent,
             HolderSessionState.PresentingEngagement,
             HolderSessionState.Connecting,
@@ -81,7 +81,7 @@ class InvalidHolderSessionStateTransitions : TestParametersValuesProvider() {
         }
         private val requestReceivedTransitions = listOf(
             HolderSessionState.NotStarted,
-            HolderSessionStateStubs.preflightEmptyPermissions,
+            HolderSessionState.Preflight,
             HolderSessionState.ReadyToPresent,
             HolderSessionState.PresentingEngagement,
             HolderSessionState.Connecting,
@@ -92,7 +92,7 @@ class InvalidHolderSessionStateTransitions : TestParametersValuesProvider() {
         }
         private val processingResponseTransitions = listOf(
             HolderSessionState.NotStarted,
-            HolderSessionStateStubs.preflightEmptyPermissions,
+            HolderSessionState.Preflight,
             HolderSessionState.ReadyToPresent,
             HolderSessionState.PresentingEngagement,
             HolderSessionState.Connecting,

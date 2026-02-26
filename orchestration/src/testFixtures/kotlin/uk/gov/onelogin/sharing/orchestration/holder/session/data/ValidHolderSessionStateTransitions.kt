@@ -3,7 +3,6 @@ package uk.gov.onelogin.sharing.orchestration.holder.session.data
 import com.google.testing.junit.testparameterinjector.TestParameters
 import com.google.testing.junit.testparameterinjector.TestParametersValuesProvider
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
-import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionStateStubs.preflightEmptyPermissions
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionStateStubs.successStub
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionStateStubs.userCancellation
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionStateStubs.userJourneyFailure
@@ -20,7 +19,7 @@ class ValidHolderSessionStateTransitions : TestParametersValuesProvider() {
 
     companion object {
         private val notStartedTransitions = listOf(
-            "Holder session begins initialising" to preflightEmptyPermissions
+            "Holder session begins initialising" to HolderSessionState.Preflight
         ).map { (testName, transition) ->
             Triple(
                 testName,
@@ -35,7 +34,7 @@ class ValidHolderSessionStateTransitions : TestParametersValuesProvider() {
         ).map { (testName, transition) ->
             Triple(
                 testName,
-                preflightEmptyPermissions,
+                HolderSessionState.Preflight,
                 transition
             )
         }

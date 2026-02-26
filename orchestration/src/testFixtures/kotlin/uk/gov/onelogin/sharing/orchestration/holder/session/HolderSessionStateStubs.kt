@@ -7,6 +7,5 @@ object HolderSessionStateStubs {
     val userCancellation: HolderSessionState = HolderSessionState.Complete.Cancelled
     val userJourneyFailure: HolderSessionState =
         HolderSessionState.Complete.Failed(SessionErrorStubs.dummySessionError)
-    val preflightEmptyPermissions: HolderSessionState = HolderSessionState.Preflight(setOf())
     val successStub: HolderSessionState = HolderSessionState.Complete.Success(DeviceResponse)
 }
