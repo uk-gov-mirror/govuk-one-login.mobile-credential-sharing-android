@@ -47,8 +47,9 @@ class HolderOrchestrator(
                 HolderSessionState.Preflight(
                     requiredPermissions
                 )
-            )
-            logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
+            ).also {
+                logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
+            }
 
             // future work: Authorization occurs within a capability check
             authorizationGate.checkAuthorization(
