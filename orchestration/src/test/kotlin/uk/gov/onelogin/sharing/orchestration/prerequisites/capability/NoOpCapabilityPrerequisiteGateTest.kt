@@ -8,13 +8,13 @@ import org.hamcrest.MatcherAssert.assertThat
 class NoOpCapabilityPrerequisiteGateTest {
 
     private val layer by lazy {
-        NoOpCapabilityPrerequisiteGate
+        NoOpCapabilityPrerequisiteGate()
     }
 
     @Test
     fun `Only returns capable responses`() = runTest {
         assertThat(
-            layer.checkCapability(CapabilityRequest(emptyList())),
+            layer.checkCapability(CapabilityRequest()),
             equalTo(CapabilityResponse.Capable)
         )
     }
