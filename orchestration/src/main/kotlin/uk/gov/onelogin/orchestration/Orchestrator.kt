@@ -2,7 +2,7 @@ package uk.gov.onelogin.orchestration
 
 import android.Manifest
 import kotlinx.coroutines.flow.SharedFlow
-import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothCentralPermissionChecker.Companion.centralPermissions
+import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothPermissionChecker.Companion.bluetoothPermissions
 import uk.gov.onelogin.sharing.core.Resettable
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationResponse
@@ -38,7 +38,7 @@ interface Orchestrator : Resettable {
     interface Verifier : Orchestrator {
         companion object {
             const val JOURNEY_NAME: String = "verifier"
-            val requiredPermissions = centralPermissions() + Manifest.permission.CAMERA
+            val requiredPermissions = bluetoothPermissions() + Manifest.permission.CAMERA
         }
     }
 
