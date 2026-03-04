@@ -11,18 +11,18 @@ import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATI
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.CANCEL_ORCHESTRATION_SUCCESS
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_ERROR
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_SUCCESS
-import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.completedAuthorizationCheck
+import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.completedPrerequisiteChecks
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.createSessionResetMessage
 import uk.gov.onelogin.orchestration.Orchestrator.LogMessages.recreateSessionOnStartMessage
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotCancelException
 import uk.gov.onelogin.orchestration.exceptions.OrchestratorCannotStartException
-import uk.gov.onelogin.sharing.bluetooth.api.permissions.bluetooth.BluetoothPermissionChecker.Companion.bluetoothPermissions
 import uk.gov.onelogin.sharing.core.logger.logTag
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSession
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
+import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteGate
-import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationRequest
-import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.AuthorizationResponse
+import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
+import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.UnauthorizedReason
 import uk.gov.onelogin.sharing.orchestration.session.SessionFactory
 import uk.gov.onelogin.sharing.security.engagement.GenerateEngagementQrCode
 
@@ -31,7 +31,7 @@ import uk.gov.onelogin.sharing.security.engagement.GenerateEngagementQrCode
 class HolderOrchestrator(
     private val logger: Logger,
     private val sessionFactory: SessionFactory<HolderSession>,
-    private val authorizationGate: PrerequisiteGate.Authorization,
+    private val prerequisiteGate: PrerequisiteGate,
     private val qrCodeData: GenerateEngagementQrCode
 ) : Orchestrator.Holder {
 
@@ -53,36 +53,19 @@ class HolderOrchestrator(
         }
 
         try {
-            session.transitionTo(
-                HolderSessionState.Preflight(requiredPermissions)
-            )
-            logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
-
-            // future work: Authorization occurs within a capability check
-            val authResult = authorizationGate.checkAuthorization(
-                AuthorizationRequest.AuthorizePermission(
-                    bluetoothPermissions()
-                )
-            ).also {
+            prerequisiteGate.checkPrerequisites(
+                Prerequisite.BLUETOOTH
+            )[Prerequisite.BLUETOOTH].also {
                 logger.debug(
                     logTag,
-                    completedAuthorizationCheck(
-                        Orchestrator.Holder.JOURNEY_NAME,
-                        it
+                    completedPrerequisiteChecks(
+                        journey = Orchestrator.Holder.JOURNEY_NAME,
+                        response = it
                     )
                 )
-            }
-
-            when (authResult) {
-                AuthorizationResponse.Authorized -> {
-                    session.transitionTo(HolderSessionState.ReadyToPresent)
-                    val qrCode = qrCodeData.generateQrCode(stateUUID)
-                    if (qrCode.isNotEmpty()) {
-                        session.transitionTo(HolderSessionState.PresentingEngagement(qrCode))
-                    }
-                }
-
-                is AuthorizationResponse.Unauthorized -> Unit
+            }?.let { prerequisiteCheck ->
+                handleStartPrerequisiteCheck(prerequisiteCheck)
+                logger.debug(logTag, START_ORCHESTRATION_SUCCESS)
             }
         } catch (exception: IllegalStateException) {
             START_ORCHESTRATION_ERROR.let { logMessage ->
@@ -92,6 +75,33 @@ class HolderOrchestrator(
                     OrchestratorCannotStartException(logMessage, exception)
                 )
             }
+        }
+    }
+
+    private fun handleStartPrerequisiteCheck(prerequisiteCheck: PrerequisiteResponse) {
+        when (prerequisiteCheck) {
+            is PrerequisiteResponse.Incapable,
+            is PrerequisiteResponse.NotReady
+            -> Unit
+
+            PrerequisiteResponse.MeetsPrerequisites -> {
+                session.transitionTo(HolderSessionState.ReadyToPresent)
+                val qrCode = qrCodeData.generateQrCode(stateUUID)
+                if (qrCode.isNotEmpty()) {
+                    session.transitionTo(
+                        HolderSessionState.PresentingEngagement(qrCode)
+                    )
+                }
+            }
+
+            is PrerequisiteResponse.Unauthorized ->
+                when (prerequisiteCheck.reason) {
+                    is UnauthorizedReason.MissingPermissions -> {
+                        session.transitionTo(
+                            HolderSessionState.Preflight(Prerequisite.BLUETOOTH)
+                        )
+                    }
+                }
         }
     }
 
