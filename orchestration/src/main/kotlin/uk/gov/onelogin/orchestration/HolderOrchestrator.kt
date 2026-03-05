@@ -22,7 +22,6 @@ import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
 import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteGate
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
-import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.UnauthorizedReason
 import uk.gov.onelogin.sharing.orchestration.session.SessionFactory
 import uk.gov.onelogin.sharing.security.engagement.GenerateEngagementQrCode
 
@@ -42,7 +41,7 @@ class HolderOrchestrator(
 
     override val holderSessionState: SharedFlow<HolderSessionState> = session.currentState
 
-    override fun start(requiredPermissions: Set<String>) {
+    override fun start() {
         if (session.isComplete()) {
             session = sessionFactory.create().also {
                 logger.debug(
@@ -80,10 +79,6 @@ class HolderOrchestrator(
 
     private fun handleStartPrerequisiteCheck(prerequisiteCheck: PrerequisiteResponse) {
         when (prerequisiteCheck) {
-            is PrerequisiteResponse.Incapable,
-            is PrerequisiteResponse.NotReady
-            -> Unit
-
             PrerequisiteResponse.MeetsPrerequisites -> {
                 session.transitionTo(HolderSessionState.ReadyToPresent)
                 val qrCode = qrCodeData.generateQrCode(stateUUID)
@@ -94,14 +89,16 @@ class HolderOrchestrator(
                 }
             }
 
+            is PrerequisiteResponse.Incapable,
+            is PrerequisiteResponse.NotReady,
             is PrerequisiteResponse.Unauthorized ->
-                when (prerequisiteCheck.reason) {
-                    is UnauthorizedReason.MissingPermissions -> {
-                        session.transitionTo(
-                            HolderSessionState.Preflight(Prerequisite.BLUETOOTH)
+                session.transitionTo(
+                    HolderSessionState.Preflight(
+                        mapOf(
+                            Prerequisite.BLUETOOTH to prerequisiteCheck
                         )
-                    }
-                }
+                    )
+                )
         }
     }
 
