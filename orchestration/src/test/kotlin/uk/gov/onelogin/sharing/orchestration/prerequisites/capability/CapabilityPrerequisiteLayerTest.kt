@@ -2,7 +2,7 @@ package uk.gov.onelogin.sharing.orchestration.prerequisites.capability
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import android.content.pm.PackageManager
+import androidx.camera.lifecycle.ProcessCameraProvider
 import io.mockk.every
 import io.mockk.mockk
 import kotlin.test.Test
@@ -14,27 +14,30 @@ import org.junit.Before
 import uk.gov.logging.testdouble.SystemLogger
 import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
+import uk.gov.onelogin.sharing.orchestration.prerequisites.camera.ProcessCameraProviderFactory
+import uk.gov.onelogin.sharing.orchestration.prerequisites.capability.IncapableReasonMatchers.cannotCheckCamera
 import uk.gov.onelogin.sharing.orchestration.prerequisites.capability.IncapableReasonMatchers.isMissingHardware
 import uk.gov.onelogin.sharing.orchestration.prerequisites.matchers.PrerequisiteResponseMatchers.hasIncapableReason
 
 class CapabilityPrerequisiteLayerTest {
+    private val processCameraProvider: ProcessCameraProvider = mockk()
     private val context: Context = mockk()
-    private val packageManager: PackageManager = mockk()
     private val bluetoothManager: BluetoothManager = mockk()
+    private var factory = ProcessCameraProviderFactory {
+        processCameraProvider
+    }
 
     private val logger = SystemLogger()
     private val capability by lazy {
         CapabilityPrerequisiteLayer(
             context,
+            factory = factory,
             logger
         )
     }
 
     @Before
     fun setUp() {
-        every {
-            context.packageManager
-        }.returns(packageManager)
         every {
             context.getSystemService(Context.BLUETOOTH_SERVICE)
         }.returns(bluetoothManager)
@@ -73,9 +76,9 @@ class CapabilityPrerequisiteLayerTest {
     }
 
     @Test
-    fun `Camera is incapable when package manager has no rear-facing camera`() = runTest {
+    fun `Camera is incapable when device has no rear-facing camera`() = runTest {
         every {
-            packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
+            processCameraProvider.hasCamera(any())
         }.returns(false)
 
         performJourney(
@@ -85,10 +88,22 @@ class CapabilityPrerequisiteLayerTest {
     }
 
     @Test
-    fun `Camera is capable when package manager has a rear-facing camera`() = runTest {
+    fun `Camera is incapable when unable to obtain a ProcessCameraProvider instance`() = runTest {
+        factory = ProcessCameraProviderFactory {
+            throw IllegalStateException("This is a unit test")
+        }
+
+        performJourney(
+            Prerequisite.CAMERA,
+            hasIncapableReason(cannotCheckCamera())
+        )
+    }
+
+    @Test
+    fun `Camera is capable when device has a rear-facing camera`() = runTest {
         every {
-            packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
-        }.returns(true)
+            processCameraProvider.hasCamera(any())
+        } returns true
 
         performJourney(
             Prerequisite.CAMERA,
