@@ -38,6 +38,9 @@ dependencies {
         projects.security
     ).forEach(::api)
 
+    listOf(projects.models)
+        .forEach(::implementation)
+
     listOf(
         libs.com.google.guava.android,
         libs.bundles.androidx.camera
@@ -45,7 +48,9 @@ dependencies {
 
     listOf(
         libs.com.google.test.parameter.injector,
-        libs.junit
+        libs.junit,
+        projects.models,
+        testFixtures(projects.security)
     ).forEach(::testFixturesApi)
 
     listOf(

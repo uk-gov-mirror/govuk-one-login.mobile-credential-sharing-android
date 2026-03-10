@@ -1,16 +1,15 @@
-package uk.gov.onelogin.sharing.holder
+package uk.gov.onelogin.sharing.bluetooth.api.peripheral.mdoc
 
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import uk.gov.onelogin.sharing.bluetooth.api.core.BluetoothStatus
-import uk.gov.onelogin.sharing.holder.mdoc.MdocSessionManager
-import uk.gov.onelogin.sharing.holder.mdoc.MdocSessionState
 
-class FakeMdocSessionManager(initialState: MdocSessionState = MdocSessionState.Idle) :
-    MdocSessionManager {
+class FakePeripheralBluetoothTransport(
+    initialState: PeripheralBluetoothState = PeripheralBluetoothState.Idle
+) : PeripheralBluetoothTransport {
     private val _state = MutableStateFlow(initialState)
-    override val state: StateFlow<MdocSessionState> = _state
+    override val state: StateFlow<PeripheralBluetoothState> = _state
 
     private val _bluetoothStatus = MutableStateFlow(BluetoothStatus.UNKNOWN)
     override val bluetoothStatus: StateFlow<BluetoothStatus> = _bluetoothStatus
@@ -23,15 +22,15 @@ class FakeMdocSessionManager(initialState: MdocSessionState = MdocSessionState.I
     override suspend fun start(serviceUuid: UUID) {
         startCalls++
         lastUuid = serviceUuid
-        _state.value = MdocSessionState.AdvertisingStarted
+        _state.value = PeripheralBluetoothState.AdvertisingStarted
     }
 
     override suspend fun stop() {
         stopCalls++
-        _state.value = MdocSessionState.AdvertisingStopped
+        _state.value = PeripheralBluetoothState.AdvertisingStopped
     }
 
-    fun emitState(state: MdocSessionState) {
+    fun emitState(state: PeripheralBluetoothState) {
         _state.value = state
     }
 
