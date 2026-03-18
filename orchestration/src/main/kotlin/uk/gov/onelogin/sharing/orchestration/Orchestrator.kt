@@ -33,6 +33,7 @@ interface Orchestrator : Resettable {
             const val JOURNEY_NAME: String = "holder"
         }
     }
+
     interface Verifier : Orchestrator {
         val verifierSessionState: Flow<VerifierSessionState>
 
@@ -50,7 +51,8 @@ interface Orchestrator : Resettable {
     data object LogMessages {
         const val START_ORCHESTRATION_ERROR: String = "Cannot start orchestration"
         const val START_ORCHESTRATION_SUCCESS: String = "start orchestration"
-        const val CANNOT_TRANSITION_TO_STATE: String = "Cannot transition to state:"
+        const val CANNOT_TRANSITION_TO_STATE: String = "Cannot transition " +
+            "from current state: %s to state: %s"
         const val TRANSITION_SUCCESSFUL_TO_STATE: String = "Transition successful to state:"
 
         fun completedPrerequisiteChecks(journey: String, response: Any?): String =

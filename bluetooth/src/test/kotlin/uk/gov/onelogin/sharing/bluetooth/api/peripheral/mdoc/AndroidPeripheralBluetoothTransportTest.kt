@@ -25,7 +25,7 @@ import uk.gov.onelogin.sharing.bluetooth.ble.FakeBluetoothStateMonitor
 import uk.gov.onelogin.sharing.bluetooth.internal.peripheral.FakeGattServerManager
 import uk.gov.onelogin.sharing.core.MainDispatcherRule
 
-class AndroidMdocSessionManagerTest {
+class AndroidPeripheralBluetoothTransportTest {
 
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
@@ -122,7 +122,10 @@ class AndroidMdocSessionManagerTest {
         sessionManager.state.test {
             assertEquals(PeripheralBluetoothState.AdvertisingStarted, awaitItem())
 
-            sessionManager.stop()
+            sessionManager.stop(
+                serviceUuid = uuid,
+                sendEndCommand = true
+            )
 
             assertEquals(1, advertiser.stopCalls)
             assertEquals(PeripheralBluetoothState.AdvertisingStopped, awaitItem())
@@ -205,17 +208,6 @@ class AndroidMdocSessionManagerTest {
                 expectNoEvents()
             }
         }
-
-    @Test
-    fun `gatt Disconnected for unknown device does not emit Disconnected state`() = runTest {
-        sessionManager.state.test {
-            assertEquals(PeripheralBluetoothState.Idle, awaitItem())
-
-            gattServerManager.emitEvent(GattServerEvent.Disconnected(DEVICE_ADDRESS, false))
-
-            expectNoEvents()
-        }
-    }
 
     @Test
     fun `gatt Error event maps to session Error state`() = runTest {

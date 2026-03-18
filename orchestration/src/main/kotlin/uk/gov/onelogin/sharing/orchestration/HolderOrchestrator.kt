@@ -7,6 +7,7 @@ import dev.zacsweers.metro.binding
 import java.security.interfaces.ECPrivateKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -55,6 +56,7 @@ class HolderOrchestrator(
     @Suppress("UnusedPrivateProperty")
     private val credentialProvider: CredentialProvider
 ) : Orchestrator.Holder {
+    private var transportStateJob: Job? = null
     private val sessionFlow = MutableStateFlow(sessionFactory.create())
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -65,6 +67,14 @@ class HolderOrchestrator(
         SharingStarted.Eagerly,
         sessionFlow.value.currentState.value
     )
+
+    init {
+        transportStateJob = appCoroutineScope.launch {
+            peripheralBluetoothTransport.state.collect {
+                handleMdocState(it)
+            }
+        }
+    }
 
     override fun start() {
         if (sessionFlow.value.isComplete()) {
@@ -78,7 +88,7 @@ class HolderOrchestrator(
             }
         }
 
-        if (holderSessionState.value !is HolderSessionState.NotStarted) {
+        if (sessionFlow.value.currentState.value !is HolderSessionState.NotStarted) {
             logger.error(
                 logTag,
                 START_ORCHESTRATION_ERROR,
@@ -122,12 +132,6 @@ class HolderOrchestrator(
                 safeTransitionTo(HolderSessionState.ReadyToPresent)
 
                 appCoroutineScope.launch {
-                    peripheralBluetoothTransport.state.collect {
-                        handleMdocState(it)
-                    }
-                }
-
-                appCoroutineScope.launch {
                     peripheralBluetoothTransport.start(
                         serviceUuid = sessionFlow.value.sessionContext.sessionUuid
                     )
@@ -158,7 +162,7 @@ class HolderOrchestrator(
             exceptionWrapper = ::OrchestratorCannotCancelException
         )
 
-        stopAdvertising()
+        stopAdvertising(sendEndCommand = true)
     }
 
     override fun reset() {
@@ -172,9 +176,12 @@ class HolderOrchestrator(
         }
     }
 
-    private fun stopAdvertising() {
+    private fun stopAdvertising(sendEndCommand: Boolean) {
         appCoroutineScope.launch {
-            peripheralBluetoothTransport.stop()
+            peripheralBluetoothTransport.stop(
+                serviceUuid = sessionFlow.value.sessionContext.sessionUuid,
+                sendEndCommand = sendEndCommand
+            )
         }
     }
 
@@ -220,8 +227,12 @@ class HolderOrchestrator(
                         logTag,
                         "BLE session terminated successfully via GATT End command"
                     )
+                    stopAdvertising(sendEndCommand = false)
                 } else {
                     logger.debug(logTag, "Error Mdoc - Disconnected: ${state.address}")
+
+                    stopAdvertising(sendEndCommand = true)
+
                     safeTransitionTo(
                         HolderSessionState.Complete.Failed(
                             SessionError(
@@ -236,8 +247,6 @@ class HolderOrchestrator(
                         )
                     )
                 }
-
-                stopAdvertising()
             }
 
             is PeripheralBluetoothState.Error -> {
@@ -313,7 +322,10 @@ class HolderOrchestrator(
 
     private fun safeTransitionTo(
         state: HolderSessionState,
-        logMessage: String = "$CANNOT_TRANSITION_TO_STATE $state",
+        logMessage: String = CANNOT_TRANSITION_TO_STATE.format(
+            sessionFlow.value.currentState.value,
+            state
+        ),
         exceptionWrapper: ((String, Throwable) -> Exception)? = null
     ) {
         try {

@@ -26,6 +26,7 @@ class AndroidBluetoothStateMonitor(private val appContext: Context, private val 
         replay = 1
     )
     override val states: SharedFlow<BluetoothStatus> = _states
+    private var isRegistered = false
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -49,6 +50,8 @@ class AndroidBluetoothStateMonitor(private val appContext: Context, private val 
     }
 
     override fun start() {
+        if (isRegistered) return
+
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         val broadcastPermission =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -74,6 +77,8 @@ class AndroidBluetoothStateMonitor(private val appContext: Context, private val 
             )
         }
 
+        isRegistered = true
+
         val adapter = appContext
             .getSystemService(BluetoothManager::class.java)
             ?.adapter
@@ -87,6 +92,9 @@ class AndroidBluetoothStateMonitor(private val appContext: Context, private val 
     }
 
     override fun stop() {
+        if (!isRegistered) return
+        isRegistered = false
+
         try {
             appContext.unregisterReceiver(receiver)
         } catch (e: IllegalArgumentException) {
