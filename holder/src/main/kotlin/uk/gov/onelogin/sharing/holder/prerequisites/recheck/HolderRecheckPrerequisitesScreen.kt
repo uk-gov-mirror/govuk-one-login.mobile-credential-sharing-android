@@ -1,15 +1,10 @@
 package uk.gov.onelogin.sharing.holder.prerequisites.recheck
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -17,7 +12,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.binding
@@ -41,6 +35,7 @@ import uk.gov.onelogin.sharing.core.HolderUiScope
 import uk.gov.onelogin.sharing.holder.R
 import uk.gov.onelogin.sharing.orchestration.Orchestrator
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
+import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
 
 @ContributesIntoMap(HolderUiScope::class, binding = binding<ViewModel>())
@@ -51,28 +46,17 @@ class HolderRecheckPrerequisitesViewModel(
 ) : ViewModel() {
     private val _preflightState = MutableStateFlow<HolderSessionState.Preflight?>(null)
     val preflightState: StateFlow<HolderSessionState.Preflight?> = _preflightState
-
-    init {
-        viewModelScope.launch(dispatcher) {
-            orchestrator.holderSessionState.collect { state ->
-                if (state is HolderSessionState.Preflight) {
-                    _preflightState.update { state }
-                }
-            }
-        }
-    }
 }
 
 @Composable
 fun HolderRecheckPrerequisitesScreen(
+    missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
     modifier: Modifier = Modifier,
     viewModel: HolderRecheckPrerequisitesViewModel = metroViewModel(),
     onTryAgainClick: () -> Unit = {},
 ) {
-    val preflightState by viewModel.preflightState.collectAsStateWithLifecycle()
-
     HolderRecheckPrerequisitesContent(
-        state = preflightState,
+        missingPrerequisites = missingPrerequisites,
         modifier = modifier,
         onTryAgainClick = onTryAgainClick,
     )
@@ -80,58 +64,49 @@ fun HolderRecheckPrerequisitesScreen(
 
 @Composable
 fun HolderRecheckPrerequisitesContent(
-    state: HolderSessionState.Preflight?,
+    missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
     modifier: Modifier = Modifier,
     onTryAgainClick: () -> Unit = {},
 ) {
-    Column(
+    val title = calculateTitleFrom(missingPrerequisites)
+    ErrorScreen(
         modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        if (state == null) {
-            CircularProgressIndicator()
-        } else {
-            val title = calculateTitleFrom(state)
-            ErrorScreen(
-                icon = { horizontalPadding ->
-                    GdsIcon(
-                        image = ImageVector.vectorResource(ErrorScreenIcon.ErrorIcon.icon),
-                        contentDescription = stringResource(ErrorScreenIcon.ErrorIcon.description),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = horizontalPadding),
-                        color = colorScheme.onBackground
-                    )
-                },
-                title = { horizontalPadding ->
-                    GdsHeading(
-                        text = title,
-                        modifier = Modifier
-                            .padding(horizontal = horizontalPadding),
-                        textAlign = GdsHeadingAlignment.CenterAligned
-                    )
-                },
-                primaryButton = {
-                    GdsButton(
-                        text = stringResource(R.string.try_again),
-                        buttonType = ButtonTypeV2.Primary(),
-                        onClick = onTryAgainClick,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+        icon = { horizontalPadding ->
+            GdsIcon(
+                image = ImageVector.vectorResource(ErrorScreenIcon.ErrorIcon.icon),
+                contentDescription = stringResource(ErrorScreenIcon.ErrorIcon.description),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = horizontalPadding),
+                color = colorScheme.onBackground
+            )
+        },
+        title = { horizontalPadding ->
+            GdsHeading(
+                text = title,
+                modifier = Modifier
+                    .padding(horizontal = horizontalPadding),
+                textAlign = GdsHeadingAlignment.CenterAligned
+            )
+        },
+        primaryButton = {
+            GdsButton(
+                text = stringResource(R.string.try_again),
+                buttonType = ButtonTypeV2.Primary(),
+                onClick = onTryAgainClick,
+                modifier = Modifier.fillMaxWidth()
             )
         }
-    }
+    )
 }
 
 private fun calculateTitleFrom(
-    state: HolderSessionState.Preflight,
+    missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
 ): String {
 
-    return if (state.missingPrerequisites.size == 1) {
-        val prerequisite = state.missingPrerequisites.keys.first()
-        when (state.missingPrerequisites.values.first()) {
+    return if (missingPrerequisites.size == 1) {
+        val prerequisite = missingPrerequisites.keys.first()
+        when (missingPrerequisites.values.first()) {
             is PrerequisiteResponse.Unauthorized ->
                 "Missing " +
                         prerequisite.name.lowercase().replaceFirstChar(Char::uppercase) +
@@ -150,11 +125,11 @@ private fun calculateTitleFrom(
 @Preview(showBackground = true)
 fun HolderRecheckPrerequisitesPreview(
     @PreviewParameter(HolderRecheckPrerequisitesStates::class)
-    state: HolderSessionState.Preflight?,
+    state: HolderSessionState.Preflight,
 ) {
     GdsTheme {
         HolderRecheckPrerequisitesContent(
-            state = state,
+            missingPrerequisites = state.missingPrerequisites,
             modifier = Modifier.fillMaxSize()
         )
     }

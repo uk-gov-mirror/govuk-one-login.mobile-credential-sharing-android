@@ -1,9 +1,17 @@
 package uk.gov.onelogin.sharing.orchestration.prerequisites.readiness
 
+import android.os.Parcelable
+import androidx.annotation.Keep
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+
 /**
  * State table for the different reasons that a device isn't ready to complete the User journey.
  */
-sealed class NotReadyReason {
+@Keep
+@Parcelize
+@Serializable
+sealed class NotReadyReason : Parcelable {
     /**
      * State for when the device doesn't have the necessary hardware for a given
      * [uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite].

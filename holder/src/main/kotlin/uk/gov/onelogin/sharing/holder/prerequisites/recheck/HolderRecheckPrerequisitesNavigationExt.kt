@@ -6,17 +6,29 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
+import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
+import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
 
 object HolderRecheckPrerequisitesNavigationExt {
     fun NavController.navigateToHolderRecheckPrerequisites(
+        missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
         options: NavOptionsBuilder.() -> Unit = {}
-    ): Unit = navigate(HolderRecheckPrerequisitesRoute, options)
+    ): Unit = navigate(
+        HolderRecheckPrerequisitesRoute(
+            missingPrerequisites = missingPrerequisites,
+        ),
+        options
+    )
 
     internal fun NavGraphBuilder.configureHolderRecheckPrerequisitesScreen(
         controller: NavController
     ) {
-        composable<HolderRecheckPrerequisitesRoute> {
+        composable<HolderRecheckPrerequisitesRoute> { navBackStackEntry ->
+        val arguments: HolderRecheckPrerequisitesRoute = navBackStackEntry.toRoute()
+
             HolderRecheckPrerequisitesScreen(
+                missingPrerequisites = arguments.missingPrerequisites,
                 modifier = Modifier.fillMaxSize()
             )
         }

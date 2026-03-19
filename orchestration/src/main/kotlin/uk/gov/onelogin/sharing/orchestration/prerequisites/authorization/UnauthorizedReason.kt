@@ -1,9 +1,17 @@
 package uk.gov.onelogin.sharing.orchestration.prerequisites.authorization
 
+import android.os.Parcelable
+import androidx.annotation.Keep
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+
 /**
  * State table for the different reasons that a device fails to authorize.
  */
-sealed class UnauthorizedReason {
+@Keep
+@Parcelize
+@Serializable
+sealed class UnauthorizedReason : Parcelable {
     /**
      * State for when the User hasn't granted the requested permissions.
      *

@@ -8,10 +8,9 @@ import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
 import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.UnauthorizedReason
 
 internal class HolderRecheckPrerequisitesStates :
-    PreviewParameterProvider<HolderSessionState.Preflight?> {
+    PreviewParameterProvider<HolderSessionState.Preflight> {
 
     private val data = listOf(
-        "Awaiting preflight response" to null,
         "Missing bluetooth permission" to
             mapOf(
                 Prerequisite.BLUETOOTH to PrerequisiteResponse.Unauthorized(
@@ -24,10 +23,10 @@ internal class HolderRecheckPrerequisitesStates :
             )
         )
     ).map { (name, responseMap) ->
-        name to responseMap?.let(HolderSessionState::Preflight)
+        name to HolderSessionState.Preflight(responseMap)
     }
 
-    override val values: Sequence<HolderSessionState.Preflight?> = data
+    override val values: Sequence<HolderSessionState.Preflight> = data
         .map { it.second }
         .asSequence()
 

@@ -15,8 +15,10 @@ object HolderPrerequisitesNavigationExt {
     internal fun NavGraphBuilder.configureHolderPrerequisitesScreen(controller: NavController) {
         composable<HolderPrerequisitesRoute> {
             HolderPrerequisitesScreen(
-                onHandlePreflight = {
-                    controller.navigateToHolderRecheckPrerequisites()
+                onHandlePreflight = { missingPrerequisites ->
+                    controller.navigateToHolderRecheckPrerequisites(
+                        missingPrerequisites = missingPrerequisites,
+                    )
                 },
                 onPresentEngagement = {
                     controller.navigateToHolderPresentQrScreen()
