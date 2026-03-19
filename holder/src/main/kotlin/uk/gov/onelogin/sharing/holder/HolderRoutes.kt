@@ -7,6 +7,7 @@ import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
 import uk.gov.onelogin.sharing.holder.prerequisites.HolderPrerequisitesNavigationExt.configureHolderPrerequisitesScreen
 import uk.gov.onelogin.sharing.holder.prerequisites.HolderPrerequisitesRoute
+import uk.gov.onelogin.sharing.holder.prerequisites.recheck.HolderRecheckPrerequisitesNavigationExt.configureHolderRecheckPrerequisitesScreen
 import uk.gov.onelogin.sharing.holder.presentation.HolderPresentQrNavigationExt.configureHolderPresentQrScreen
 
 @Keep
@@ -15,6 +16,7 @@ data object HolderRoutes {
     fun NavGraphBuilder.configureHolderRoutes(controller: NavController) {
         navigation<HolderRoutes>(startDestination = HolderPrerequisitesRoute) {
             configureHolderPrerequisitesScreen(controller)
+            configureHolderRecheckPrerequisitesScreen(controller)
             configureHolderPresentQrScreen()
         }
     }

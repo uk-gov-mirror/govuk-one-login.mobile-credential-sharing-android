@@ -18,11 +18,11 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
         resourceId = R.string.bluetooth_turned_off_holder
     ),
     CHECKING_JOURNEY_REQUIREMENTS(
-        expected = "Checking journey requirements...",
+        expected = "Checking journey requirements…",
         resourceId = R.string.checking_journey_requirements
     ),
     CREATING_QR_CODE(
-        expected = "Creating QR code...",
+        expected = "Creating QR code…",
         resourceId = R.string.creating_qr_code
     ),
     ENABLE_BLUETOOTH_PERMISSION(
@@ -30,15 +30,19 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
         resourceId = R.string.enable_bluetooth_permission
     ),
     GENERATING_QR_CODE_DATA(
-        expected = "Generating QR code data...",
+        expected = "Generating QR code data…",
         resourceId = R.string.generating_qr_code_data
     ),
     HAVE_NOT_MET_REQUIREMENTS(
-        expected = "Haven’t met requirements...",
+        expected = "Haven’t met requirements…",
         resourceId = R.string.have_not_met_requirements
     ),
     OPEN_APP_PERMISSIONS(
         expected = "Open app permissions",
         resourceId = R.string.open_app_permissions
+    ),
+    TRY_AGAIN(
+        expected = "Try again",
+        resourceId = R.string.try_again,
     )
 }
