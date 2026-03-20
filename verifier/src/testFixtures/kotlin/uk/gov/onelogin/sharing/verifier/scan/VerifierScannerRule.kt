@@ -1,10 +1,8 @@
 package uk.gov.onelogin.sharing.verifier.scan
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.test.assert
@@ -17,12 +15,6 @@ import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasFlags
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.MultiplePermissionsState
-import org.hamcrest.CoreMatchers.allOf
 import uk.gov.android.ui.componentsv2.matchers.SemanticsMatchers.hasRole
 import uk.gov.onelogin.sharing.core.presentation.ButtonTestTags.PERMISSION_PERMANENT_DENIAL_BUTTON
 import uk.gov.onelogin.sharing.core.presentation.ButtonTestTags.PERMISSION_RATIONALE_BUTTON
@@ -36,7 +28,6 @@ import uk.gov.onelogin.sharing.verifier.scan.BarcodeAnalysisUrlContractAssertion
  */
 class VerifierScannerRule(
     composeTestRule: ComposeContentTestRule,
-    private val openAppSettingsText: String,
     private val permissionDeniedText: String
 ) : ComposeContentTestRule by composeTestRule {
 
@@ -48,7 +39,6 @@ class VerifierScannerRule(
         resources: Resources = ApplicationProvider.getApplicationContext<Context>().resources
     ) : this(
         composeTestRule = composeTestRule,
-        openAppSettingsText = resources.getString(R.string.open_app_permissions),
         permissionDeniedText = resources.getString(R.string.enable_camera_permission_to_continue)
     )
 
@@ -62,8 +52,6 @@ class VerifierScannerRule(
         intended(hasState(expected))
     }
 
-    fun assertOpenAppSettingsButtonIsDisplayed() = onOpenAppSettingsButton().assertIsDisplayed()
-
     fun assertPermissionPermanentlyDeniedButtonIsDisplayed() =
         onPermissionPermanentlyDeniedButton().assertIsDisplayed()
 
@@ -75,11 +63,6 @@ class VerifierScannerRule(
     fun assertPermissionDeniedTextIsDisplayed() = onPermissionDeniedText().assertIsDisplayed()
 
     fun onCameraViewfinder() = onNodeWithTag("cameraViewfinder").assertExists()
-
-    fun onOpenAppSettingsButton() = onNodeWithText(openAppSettingsText)
-        .assertExists()
-        .assert(hasRole(Role.Button))
-        .assertHasClickAction()
 
     fun onPermissionPermanentlyDeniedButton() = onNodeWithTag(
         PERMISSION_PERMANENT_DENIAL_BUTTON
@@ -100,16 +83,6 @@ class VerifierScannerRule(
         .assertHasClickAction()
 
     fun onPermissionDeniedText() = onNodeWithText(permissionDeniedText).assertIsDisplayed()
-
-    fun performOpenAppSettingsClick() = onOpenAppSettingsButton().performClick().also {
-        intended(
-            allOf(
-                hasAction("android.settings.APPLICATION_DETAILS_SETTINGS"),
-                hasData("package:uk.gov.onelogin.sharing.verifier.test"),
-                hasFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            )
-        )
-    }
 
     fun performPermissionDeniedClick() = onPermissionPermanentlyDeniedButton().performClick()
 

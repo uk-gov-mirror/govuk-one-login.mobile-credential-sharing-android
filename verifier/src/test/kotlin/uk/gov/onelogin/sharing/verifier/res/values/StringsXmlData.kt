@@ -38,10 +38,6 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
         expected = "Bluetooth connection failed",
         resourceId = R.string.bluetooth_connection_failed
     ),
-    OPEN_APP_PERMISSIONS(
-        expected = "Open app permissions",
-        resourceId = R.string.open_app_permissions
-    ),
     SEARCHING_FOR_UUIDS(
         expected = "Searching for UUIDs:",
         resourceId = R.string.searching_for_uuids

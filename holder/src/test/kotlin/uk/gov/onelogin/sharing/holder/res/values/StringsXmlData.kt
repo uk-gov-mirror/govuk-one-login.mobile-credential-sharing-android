@@ -37,8 +37,4 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
         expected = "Haven’t met requirements…",
         resourceId = R.string.have_not_met_requirements
     ),
-    OPEN_APP_PERMISSIONS(
-        expected = "Open app permissions",
-        resourceId = R.string.open_app_permissions
-    )
 }

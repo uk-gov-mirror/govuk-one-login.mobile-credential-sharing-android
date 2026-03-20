@@ -29,6 +29,10 @@ enum class DeferredStringsXmlData(
         defersTo = R.string.generating_qr_code_data,
         resourceId = R.string.holder_prerequisites_ready_to_present
     ),
+    HOLDER_WELCOME_OPEN_APP_PERMISSIONS(
+        defersTo = coreR.string.open_app_permissions,
+        resourceId = R.string.holder_welcome_open_app_permissions
+    ),
     RECHECK_PREREQUISITES_TRY_AGAIN(
         defersTo = coreR.string.try_again,
         resourceId = R.string.recheck_prerequisites_try_again

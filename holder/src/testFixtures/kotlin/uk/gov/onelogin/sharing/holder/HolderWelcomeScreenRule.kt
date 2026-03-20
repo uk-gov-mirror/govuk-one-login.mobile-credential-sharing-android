@@ -41,7 +41,7 @@ class HolderWelcomeScreenRule(
     ) : this(
         composeTestRule = composeTestRule,
         enablePermissionsText = resources.getString(R.string.enable_bluetooth_permission),
-        openAppSettingsText = resources.getString(R.string.open_app_permissions),
+        openAppSettingsText = resources.getString(R.string.holder_welcome_open_app_permissions),
         permissionDeniedText = resources.getString(
             R.string.bluetooth_permission_permanently_denied
         ),

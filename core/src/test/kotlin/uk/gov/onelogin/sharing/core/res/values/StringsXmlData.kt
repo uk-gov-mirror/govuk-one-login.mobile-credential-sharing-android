@@ -33,6 +33,10 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
         expected = "Bluetooth disconnected unexpectedly",
         resourceId = R.string.bluetooth_disconnected_unexpectedly
     ),
+    OPEN_APP_PERMISSIONS(
+        expected = "Open app permissions",
+        resourceId = R.string.open_app_permissions
+    ),
     PERMISSIONS_REVOKED(
         expected = "Bluetooth permissions were revoked during the session",
         resourceId = R.string.bluetooth_permissions_revoked

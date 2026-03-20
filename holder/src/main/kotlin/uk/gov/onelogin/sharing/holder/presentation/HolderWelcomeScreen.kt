@@ -129,7 +129,7 @@ fun BluetoothPermissionPrompt(
                 context = LocalContext.current,
                 modifier = modifier,
                 titleText = stringResource(R.string.bluetooth_permission_permanently_denied),
-                buttonText = stringResource(R.string.open_app_permissions)
+                buttonText = stringResource(R.string.holder_welcome_open_app_permissions)
             )
         }
 

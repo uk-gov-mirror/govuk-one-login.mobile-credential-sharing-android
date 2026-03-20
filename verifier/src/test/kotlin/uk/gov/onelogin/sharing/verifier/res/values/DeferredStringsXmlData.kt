@@ -36,9 +36,5 @@ enum class DeferredStringsXmlData(
     VERIFIER_SCANNER_REQUIRE_CAMERA_RATIONALE(
         R.string.enable_camera_permission_to_continue,
         R.string.verifier_scanner_require_camera_rationale
-    ),
-    VERIFIER_SCANNER_REQUIRE_OPEN_PERMISSIONS(
-        R.string.open_app_permissions,
-        R.string.verifier_scanner_require_open_permissions
     )
 }
