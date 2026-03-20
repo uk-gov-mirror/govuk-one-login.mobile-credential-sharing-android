@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattService
 import android.content.Context
 import androidx.annotation.RequiresPermission
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesBinding
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -25,8 +27,9 @@ import uk.gov.onelogin.sharing.core.logger.logTag
 
 const val INVALID_SERVICE = "Gatt Service does not have a state characteristic"
 
+@ContributesBinding(AppScope::class)
 @Suppress("TooManyFunctions")
-internal class AndroidGattClientManager(
+class AndroidGattClientManager(
     private val context: Context,
     private val permissionChecker: BluetoothPermissionChecker,
     private val serviceValidator: ServiceValidator,
@@ -94,15 +97,16 @@ internal class AndroidGattClientManager(
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    override fun writeSessionEnd() {
-        val gatt = bluetoothGatt.let { bluetoothGatt } ?: return
+    override fun notifySessionEnd(): SessionEndStates {
+        val gatt =
+            bluetoothGatt.let { bluetoothGatt } ?: return SessionEndStates.WRITE_TO_SERVER_FAILED
 
         val state = gatt
             .getService(serviceUuid)
             .getCharacteristic(GattUuids.STATE_UUID) ?: return handleError(
             ClientError.INVALID_SERVICE,
             INVALID_SERVICE
-        )
+        ).let { SessionEndStates.WRITE_TO_SERVER_FAILED }
 
         val endVal = byteArrayOf(MdocState.END.code)
 
@@ -112,20 +116,15 @@ internal class AndroidGattClientManager(
             value = endVal
         )
 
-        val event =
-            if (writeSuccess) {
-                logger.debug(logTag, "GATT: Wrote 0x02 to State characteristic")
-                logger.debug(
-                    logTag,
-                    "BLE session terminated successfully via GATT End command"
-                )
-                isSessionEnd = true
-                GattClientEvent.SessionEnd(SessionEndStates.SUCCESS)
-            } else {
-                GattClientEvent.SessionEnd(SessionEndStates.WRITE_TO_SERVER_FAILED)
-            }
+        if (!writeSuccess) return SessionEndStates.WRITE_TO_SERVER_FAILED
 
-        _events.tryEmit(event)
+        logger.debug(logTag, "GATT: Wrote 0x02 to State characteristic")
+        logger.debug(
+            logTag,
+            "BLE session terminated successfully via GATT End command"
+        )
+        isSessionEnd = true
+        return SessionEndStates.SUCCESS
     }
 
     private fun handleGattEvent(event: GattEvent) {
