@@ -10,4 +10,6 @@
     <!-- Bluetooth connection errors -->
     <string name="bluetooth_disconnected_unexpectedly">Bluetooth disconnected unexpectedly</string>
     <string name="bluetooth_permissions_revoked">Bluetooth permissions were revoked during the session</string>
+
+    <string name="try_again">Try again</string>
 </resources>

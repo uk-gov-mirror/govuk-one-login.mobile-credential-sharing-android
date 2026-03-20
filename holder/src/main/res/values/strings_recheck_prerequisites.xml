@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="recheck_prerequisites_try_again" translatable="false">@string/try_again</string>
+</resources>

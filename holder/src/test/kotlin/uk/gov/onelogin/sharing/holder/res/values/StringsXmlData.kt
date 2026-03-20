@@ -40,9 +40,5 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
     OPEN_APP_PERMISSIONS(
         expected = "Open app permissions",
         resourceId = R.string.open_app_permissions
-    ),
-    TRY_AGAIN(
-        expected = "Try again",
-        resourceId = R.string.try_again,
     )
 }

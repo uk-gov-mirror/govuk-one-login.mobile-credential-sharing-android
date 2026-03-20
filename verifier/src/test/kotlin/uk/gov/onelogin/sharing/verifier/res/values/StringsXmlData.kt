@@ -50,8 +50,4 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
         expected = "Successfully scanned QR code data:",
         resourceId = R.string.successfully_scanned_qr_code_data
     ),
-    TRY_AGAIN(
-        expected = "Try again",
-        resourceId = R.string.try_again
-    )
 }

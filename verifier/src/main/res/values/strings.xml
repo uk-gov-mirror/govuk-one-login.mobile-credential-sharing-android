@@ -11,7 +11,6 @@
     <string name="open_app_permissions">Open app permissions</string>
     <string name="searching_for_uuids">Searching for UUIDs:</string>
     <string name="successfully_scanned_qr_code_data">Successfully scanned QR code data:</string>
-    <string name="try_again">Try again</string>
 
     <string name="bluetooth_turned_off_verifier">Bluetooth was turned off on verifier device during session</string>
 </resources>

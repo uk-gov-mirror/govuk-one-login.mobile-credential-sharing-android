@@ -9,6 +9,10 @@ import uk.gov.onelogin.sharing.core.R
  * Ensures that tests would fail when strings update without updating this test data.
  */
 enum class StringsXmlData(val expected: String, @param:StringRes val resourceId: Int) {
+    AN_ERROR_HAS_OCCURRED(
+        expected = "An error has occurred",
+        resourceId = R.string.an_error_has_occurred
+    ),
     DISABLED(
         expected = "Disabled",
         resourceId = R.string.disabled
@@ -32,5 +36,9 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
     PERMISSIONS_REVOKED(
         expected = "Bluetooth permissions were revoked during the session",
         resourceId = R.string.bluetooth_permissions_revoked
+    ),
+    TRY_AGAIN(
+        expected = "Try again",
+        resourceId = R.string.try_again
     )
 }

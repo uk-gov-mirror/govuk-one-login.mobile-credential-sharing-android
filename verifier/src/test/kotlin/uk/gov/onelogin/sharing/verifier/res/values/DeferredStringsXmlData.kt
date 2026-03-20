@@ -2,6 +2,7 @@ package uk.gov.onelogin.sharing.verifier.res.values
 
 import androidx.annotation.StringRes
 import uk.gov.onelogin.sharing.verifier.R
+import uk.gov.onelogin.sharing.core.R as coreR
 
 /**
  * Test data used with [StringsXmlTest] for resource IDs that defer to another string resource.
@@ -21,7 +22,7 @@ enum class DeferredStringsXmlData(
         R.string.scanned_invalid_qr_title
     ),
     SCANNED_INVALID_QR_TRY_AGAIN(
-        R.string.try_again,
+        coreR.string.try_again,
         R.string.scanned_invalid_qr_try_again
     ),
     VERIFIER_SCANNER_CAMERA_PERMISSION_PERMANENTLY_DENIED(

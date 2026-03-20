@@ -2,6 +2,7 @@ package uk.gov.onelogin.sharing.holder.res.values
 
 import androidx.annotation.StringRes
 import uk.gov.onelogin.sharing.holder.R
+import uk.gov.onelogin.sharing.core.R as coreR
 
 /**
  * Test data used with [StringsXmlTest] for resource IDs that defer to another string resource.
@@ -27,5 +28,9 @@ enum class DeferredStringsXmlData(
     HOLDER_PREREQUISITES_READY_TO_PRESENT(
         defersTo = R.string.generating_qr_code_data,
         resourceId = R.string.holder_prerequisites_ready_to_present
+    ),
+    RECHECK_PREREQUISITES_TRY_AGAIN(
+        defersTo = coreR.string.try_again,
+        resourceId = R.string.recheck_prerequisites_try_again
     )
 }

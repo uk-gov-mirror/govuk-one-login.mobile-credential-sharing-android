@@ -170,7 +170,7 @@ fun HolderRecheckPrerequisitesContent(
         },
         primaryButton = {
             GdsButton(
-                text = stringResource(R.string.try_again),
+                text = stringResource(R.string.recheck_prerequisites_try_again),
                 buttonType = ButtonTypeV2.Primary(),
                 onClick = onTryAgainClick,
                 modifier = Modifier.fillMaxWidth()
