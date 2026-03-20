@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="recheck_prerequisites_missing_prerequisite_permissions" translatable="false">@string/missing_prerequisite_permissions</string>
+    <string name="recheck_prerequisites_open_app_permissions" translatable="false">@string/open_app_permissions</string>
+    <string name="recheck_prerequisites_phone_is_not_ready" translatable="false">@string/phone_is_not_ready</string>
     <string name="recheck_prerequisites_try_again" translatable="false">@string/try_again</string>
+    <string name="recheck_prerequisites_unsupported_journey" translatable="false">@string/unsupported_journey</string>
 </resources>

@@ -1,10 +1,6 @@
 package uk.gov.onelogin.sharing.holder.prerequisites.recheck
 
 import android.content.Context
-import android.util.Log
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -48,13 +44,13 @@ import uk.gov.android.ui.theme.m3.GdsTheme
 import uk.gov.onelogin.sharing.core.HolderUiScope
 import uk.gov.onelogin.sharing.core.presentation.buttons.openSettingsIntent
 import uk.gov.onelogin.sharing.holder.R
+import uk.gov.onelogin.sharing.holder.prerequisites.recheck.preview.HolderRecheckPrerequisitesStates
+import uk.gov.onelogin.sharing.holder.prerequisites.recheck.preview.HolderRecheckPrerequisitesStatesEntry
 import uk.gov.onelogin.sharing.holder.presentation.isPermanentlyDenied
 import uk.gov.onelogin.sharing.orchestration.Orchestrator
-import uk.gov.onelogin.sharing.orchestration.Orchestrator.Verifier.Companion.requiredPermissions
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
 import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
-import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.UnauthorizedReason
 
 @ContributesIntoMap(HolderUiScope::class, binding = binding<ViewModel>())
 @ViewModelKey(HolderRecheckPrerequisitesViewModel::class)
@@ -87,7 +83,6 @@ fun HolderRecheckPrerequisitesScreen(
     viewModel: HolderRecheckPrerequisitesViewModel = metroViewModel(),
     onHandlePreflight: (Map<Prerequisite, PrerequisiteResponse>) -> Unit = {},
     onPresentEngagement: () -> Unit = {},
-    onPermanentlyDenyPermission: () -> Unit = {}
 ) {
     val currentOnHandlePreflight by rememberUpdatedState(onHandlePreflight)
     val currentOnPresentEngagement by rememberUpdatedState(onPresentEngagement)
@@ -101,6 +96,9 @@ fun HolderRecheckPrerequisitesScreen(
     }
 
     HolderRecheckPrerequisitesContent(
+        buttonText = stringResource(
+            calculateButtonTextFrom(multiplePermissionsState)
+        ),
         missingPrerequisites = missingPrerequisites,
         modifier = modifier,
         onTryAgainClick = {
@@ -108,7 +106,6 @@ fun HolderRecheckPrerequisitesScreen(
                 context = context,
                 missingPrerequisites,
                 multiplePermissionsState,
-                onPermanentlyDenyPermission,
             )
         },
     )
@@ -144,6 +141,7 @@ fun Map<Prerequisite, PrerequisiteResponse>.getMissingPermissions(): List<String
 @Composable
 fun HolderRecheckPrerequisitesContent(
     missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
+    buttonText: String,
     modifier: Modifier = Modifier,
     onTryAgainClick: () -> Unit = {},
 ) {
@@ -170,7 +168,7 @@ fun HolderRecheckPrerequisitesContent(
         },
         primaryButton = {
             GdsButton(
-                text = stringResource(R.string.recheck_prerequisites_try_again),
+                text = buttonText,
                 buttonType = ButtonTypeV2.Primary(),
                 onClick = onTryAgainClick,
                 modifier = Modifier.fillMaxWidth()
@@ -184,7 +182,6 @@ private fun calculateButtonActionFrom(
     context: Context,
     missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
     permissionContract: MultiplePermissionsState,
-    onPermanentlyDenyPermission: () -> Unit = {}
 ) {
     val missingPermissions = missingPrerequisites.getMissingPermissions()
 
@@ -195,6 +192,16 @@ private fun calculateButtonActionFrom(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
+private fun calculateButtonTextFrom(
+    permissionState: MultiplePermissionsState
+): Int = if (permissionState.isPermanentlyDenied()) {
+    R.string.recheck_prerequisites_open_app_permissions
+} else {
+    R.string.recheck_prerequisites_try_again
+}
+
+@Composable
 private fun calculateTitleFrom(
     missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
 ): String {
@@ -203,12 +210,14 @@ private fun calculateTitleFrom(
         val prerequisite = missingPrerequisites.keys.first()
         when (missingPrerequisites.values.first()) {
             is PrerequisiteResponse.Unauthorized ->
-                "Missing " +
-                        prerequisite.name.lowercase().replaceFirstChar(Char::uppercase) +
-                        " permissions"
-
-            is PrerequisiteResponse.Incapable -> "Unsupported journey"
-            is PrerequisiteResponse.NotReady -> "Phone isn't ready"
+                stringResource(
+                    R.string.recheck_prerequisites_missing_prerequisite_permissions,
+                    prerequisite.name.lowercase().replaceFirstChar(Char::uppercase)
+                )
+            is PrerequisiteResponse.Incapable ->
+                stringResource(R.string.recheck_prerequisites_unsupported_journey)
+            is PrerequisiteResponse.NotReady ->
+                stringResource(R.string.recheck_prerequisites_phone_is_not_ready)
             else -> ""
         }
     } else {
@@ -216,15 +225,19 @@ private fun calculateTitleFrom(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 @Preview(showBackground = true)
 fun HolderRecheckPrerequisitesPreview(
     @PreviewParameter(HolderRecheckPrerequisitesStates::class)
-    state: HolderSessionState.Preflight,
+    entry: HolderRecheckPrerequisitesStatesEntry,
 ) {
     GdsTheme {
         HolderRecheckPrerequisitesContent(
-            missingPrerequisites = state.missingPrerequisites,
+            buttonText = stringResource(
+                calculateButtonTextFrom(entry.permissionState)
+            ),
+            missingPrerequisites = entry.sessionState.missingPrerequisites,
             modifier = Modifier.fillMaxSize()
         )
     }
