@@ -76,30 +76,7 @@ class HolderOrchestrator(
         }
     }
 
-    override fun start() {
-        if (sessionFlow.value.isComplete()) {
-            sessionFlow.update {
-                sessionFactory.create().also {
-                    logger.debug(
-                        logTag,
-                        recreateSessionOnStartMessage(Orchestrator.Holder.JOURNEY_NAME)
-                    )
-                }
-            }
-        }
-
-        if (sessionFlow.value.currentState.value !is HolderSessionState.NotStarted) {
-            logger.error(
-                logTag,
-                START_ORCHESTRATION_ERROR,
-                OrchestratorCannotStartException(
-                    START_ORCHESTRATION_ERROR,
-                    IllegalStateException("Journey already in progress")
-                )
-            )
-            return
-        }
-
+    override fun checkPrerequisites() {
         try {
             prerequisiteGate.checkPrerequisites(
                 Prerequisite.BLUETOOTH
@@ -124,6 +101,33 @@ class HolderOrchestrator(
                 )
             }
         }
+    }
+
+    override fun start() {
+        if (sessionFlow.value.isComplete()) {
+            sessionFlow.update {
+                sessionFactory.create().also {
+                    logger.debug(
+                        logTag,
+                        recreateSessionOnStartMessage(Orchestrator.Holder.JOURNEY_NAME)
+                    )
+                }
+            }
+        }
+
+        if (sessionFlow.value.currentState.value !is HolderSessionState.NotStarted) {
+            logger.error(
+                logTag,
+                START_ORCHESTRATION_ERROR,
+                OrchestratorCannotStartException(
+                    START_ORCHESTRATION_ERROR,
+                    IllegalStateException("Journey already in progress")
+                )
+            )
+            return
+        }
+
+        checkPrerequisites()
     }
 
     private fun handleStartPrerequisiteCheck(prerequisiteCheck: PrerequisiteResponse) {

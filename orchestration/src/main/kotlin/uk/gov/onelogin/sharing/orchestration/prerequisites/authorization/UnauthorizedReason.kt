@@ -17,6 +17,8 @@ sealed class UnauthorizedReason : Parcelable {
      *
      * @param missingPermissions The list of permissions that the User needs to grant.
      */
+    @Serializable
+    @Parcelize
     data class MissingPermissions(val missingPermissions: Set<String>) :
         UnauthorizedReason(),
         Iterable<String> by missingPermissions {

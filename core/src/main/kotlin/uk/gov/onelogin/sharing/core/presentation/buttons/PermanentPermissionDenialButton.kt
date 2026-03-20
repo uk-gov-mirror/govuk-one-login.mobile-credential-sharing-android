@@ -21,6 +21,17 @@ import uk.gov.android.ui.theme.m3.GdsLocalColorScheme
 import uk.gov.android.ui.theme.m3.GdsTheme
 import uk.gov.onelogin.sharing.core.presentation.ButtonTestTags.PERMISSION_PERMANENT_DENIAL_BUTTON
 
+fun openSettingsIntent(context: Context): Intent = Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts(
+            "package",
+            context.packageName,
+            null
+        )
+    ).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
 @Composable
 fun PermanentPermissionDenialButton(
     context: Context,
@@ -38,19 +49,7 @@ fun PermanentPermissionDenialButton(
             modifier = Modifier.testTag(PERMISSION_PERMANENT_DENIAL_BUTTON),
             text = buttonText,
             buttonType = ButtonTypeV2.Primary(),
-            onClick = {
-                val intent =
-                    Intent(
-                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                        Uri.fromParts(
-                            "package",
-                            context.packageName,
-                            null
-                        )
-                    )
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-            }
+            onClick = { context.startActivity(openSettingsIntent(context)) }
         )
     }
 }

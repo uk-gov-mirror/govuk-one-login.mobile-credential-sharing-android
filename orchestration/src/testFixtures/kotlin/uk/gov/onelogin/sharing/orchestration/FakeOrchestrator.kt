@@ -27,6 +27,11 @@ class FakeOrchestrator(
 
     var startCount = 0
     var cancelCount = 0
+    var prerequisiteCheckCount = 0
+
+    override fun checkPrerequisites() {
+        prerequisiteCheckCount++
+    }
 
     override fun start() {
         startCount++
@@ -37,6 +42,7 @@ class FakeOrchestrator(
     }
 
     override fun reset() {
+        prerequisiteCheckCount = 0
         startCount = 0
         cancelCount = 0
     }

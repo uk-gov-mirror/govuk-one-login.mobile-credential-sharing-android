@@ -16,6 +16,8 @@ sealed class NotReadyReason : Parcelable {
      * State for when the device doesn't have the necessary hardware for a given
      * [uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite].
      */
+    @Serializable
+    @Parcelize
     data object BluetoothTurnedOff : NotReadyReason()
 
     /**
@@ -23,10 +25,14 @@ sealed class NotReadyReason : Parcelable {
      *
      * This may occur during picture-in-picture modes or with foldable devices.
      */
+    @Serializable
+    @Parcelize
     data object CameraAlreadyInUse : NotReadyReason()
 
     /**
      * State for when the Android-powered device's cameras cannot be queried.
      */
+    @Serializable
+    @Parcelize
     data object CannotCheckCamera : NotReadyReason()
 }

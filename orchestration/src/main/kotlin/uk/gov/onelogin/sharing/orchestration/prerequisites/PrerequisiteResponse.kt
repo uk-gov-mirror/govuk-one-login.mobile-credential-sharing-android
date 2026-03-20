@@ -10,8 +10,23 @@ import uk.gov.onelogin.sharing.orchestration.prerequisites.readiness.NotReadyRea
 @Serializable
 @Parcelize
 sealed class PrerequisiteResponse : Parcelable {
+    @Serializable
+    @Parcelize
     data object MeetsPrerequisites : PrerequisiteResponse()
+
+    @Serializable
+    @Parcelize
     data class Incapable(val reason: IncapableReason) : PrerequisiteResponse()
+
+    @Serializable
+    @Parcelize
     data class NotReady(val reason: NotReadyReason) : PrerequisiteResponse()
-    data class Unauthorized(val reason: UnauthorizedReason) : PrerequisiteResponse()
+
+    @Serializable
+    @Parcelize
+    data class Unauthorized(val reason: UnauthorizedReason) : PrerequisiteResponse() {
+        fun getMissingPermissions(): Set<String> = (
+                reason as? UnauthorizedReason.MissingPermissions
+                )?.missingPermissions ?: emptySet()
+    }
 }

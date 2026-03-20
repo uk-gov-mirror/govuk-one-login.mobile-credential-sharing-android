@@ -57,30 +57,7 @@ class VerifierOrchestrator(
         sessionFlow.value.currentState.value
     )
 
-    override fun start() {
-        if (sessionFlow.value.isComplete()) {
-            sessionFlow.update {
-                sessionFactory.create().also {
-                    logger.debug(
-                        logTag,
-                        recreateSessionOnStartMessage(Orchestrator.Verifier.JOURNEY_NAME)
-                    )
-                }
-            }
-        }
-
-        if (sessionFlow.value.currentState.value !is VerifierSessionState.NotStarted) {
-            logger.error(
-                logTag,
-                START_ORCHESTRATION_ERROR,
-                OrchestratorCannotStartException(
-                    START_ORCHESTRATION_ERROR,
-                    IllegalStateException("Journey already in progress")
-                )
-            )
-            return
-        }
-
+    override fun checkPrerequisites() {
         try {
             val prerequisites = listOf(
                 Prerequisite.BLUETOOTH,
@@ -114,6 +91,33 @@ class VerifierOrchestrator(
                 )
             }
         }
+    }
+
+    override fun start() {
+        if (sessionFlow.value.isComplete()) {
+            sessionFlow.update {
+                sessionFactory.create().also {
+                    logger.debug(
+                        logTag,
+                        recreateSessionOnStartMessage(Orchestrator.Verifier.JOURNEY_NAME)
+                    )
+                }
+            }
+        }
+
+        if (sessionFlow.value.currentState.value !is VerifierSessionState.NotStarted) {
+            logger.error(
+                logTag,
+                START_ORCHESTRATION_ERROR,
+                OrchestratorCannotStartException(
+                    START_ORCHESTRATION_ERROR,
+                    IllegalStateException("Journey already in progress")
+                )
+            )
+            return
+        }
+
+        checkPrerequisites()
     }
 
     private fun handleStartPrerequisiteFailure(
