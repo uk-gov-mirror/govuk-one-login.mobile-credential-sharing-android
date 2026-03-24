@@ -26,7 +26,7 @@ sealed class PrerequisiteResponse : Parcelable {
     @Parcelize
     data class Unauthorized(val reason: UnauthorizedReason) : PrerequisiteResponse() {
         fun getMissingPermissions(): Set<String> = (
-                reason as? UnauthorizedReason.MissingPermissions
-                )?.missingPermissions ?: emptySet()
+            reason as? UnauthorizedReason.MissingPermissions
+            )?.missingPermissions ?: emptySet()
     }
 }

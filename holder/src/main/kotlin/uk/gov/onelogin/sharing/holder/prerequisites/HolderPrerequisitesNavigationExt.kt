@@ -17,7 +17,7 @@ object HolderPrerequisitesNavigationExt {
             HolderPrerequisitesScreen(
                 onHandlePreflight = { missingPrerequisites ->
                     controller.navigateToHolderRecheckPrerequisites(
-                        missingPrerequisites = missingPrerequisites,
+                        missingPrerequisites = missingPrerequisites
                     )
                 },
                 onPresentEngagement = {

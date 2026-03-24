@@ -18,7 +18,7 @@ object HolderRecheckPrerequisitesNavigationExt {
         options: NavOptionsBuilder.() -> Unit = {}
     ): Unit = navigate(
         HolderRecheckPrerequisitesRoute(
-            missingPrerequisites = HashMap(missingPrerequisites),
+            missingPrerequisites = HashMap(missingPrerequisites)
         ),
         options
     )
@@ -30,7 +30,7 @@ object HolderRecheckPrerequisitesNavigationExt {
         composable<HolderRecheckPrerequisitesRoute>(
             typeMap = HolderRecheckPrerequisitesRoute.typeMap
         ) { navBackStackEntry ->
-        val arguments: HolderRecheckPrerequisitesRoute = navBackStackEntry.toRoute()
+            val arguments: HolderRecheckPrerequisitesRoute = navBackStackEntry.toRoute()
 
             HolderRecheckPrerequisitesScreen(
                 missingPrerequisites = arguments.missingPrerequisites,

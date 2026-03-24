@@ -8,7 +8,7 @@ import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
 data class HolderRecheckPrerequisitesStatesEntry(
     val name: String,
     val permissionState: MultiplePermissionsState,
-    val sessionState: HolderSessionState.Preflight,
+    val sessionState: HolderSessionState.Preflight
 ) {
     constructor(
         data: Triple<String, MultiplePermissionsState, HolderSessionState.Preflight>

@@ -13,16 +13,16 @@ internal object PrerequisiteHashMapNavEntry : NavType<HashMap<Prerequisite, Prer
     override fun put(
         bundle: SavedState,
         key: String,
-        value: HashMap<Prerequisite, PrerequisiteResponse>,
+        value: HashMap<Prerequisite, PrerequisiteResponse>
     ) {
         bundle.putSerializable(key, value)
     }
 
     override fun get(
         bundle: SavedState,
-        key: String,
-    ): HashMap<Prerequisite, PrerequisiteResponse>? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        key: String
+    ): HashMap<Prerequisite, PrerequisiteResponse>? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val result = mutableMapOf<Prerequisite, PrerequisiteResponse>()
             val map = bundle.getParcelable(key, HashMap::class.java)
 
@@ -38,7 +38,6 @@ internal object PrerequisiteHashMapNavEntry : NavType<HashMap<Prerequisite, Prer
             @Suppress("DEPRECATION")
             bundle.getParcelable(key)
         }
-    }
 
     override fun parseValue(value: String): HashMap<Prerequisite, PrerequisiteResponse> =
         Json.Default.decodeFromString<HashMap<Prerequisite, PrerequisiteResponse>>(value)

@@ -1,8 +1,8 @@
 package uk.gov.onelogin.sharing.verifier.connect.error
 
 import androidx.annotation.StringRes
-import uk.gov.onelogin.sharing.verifier.R
 import uk.gov.onelogin.sharing.core.R as coreR
+import uk.gov.onelogin.sharing.verifier.R
 
 /**
  * Test data used with [StringsXmlTest] for resource IDs that defer to another string resource.

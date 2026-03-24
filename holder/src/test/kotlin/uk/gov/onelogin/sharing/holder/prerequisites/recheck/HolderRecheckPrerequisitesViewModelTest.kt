@@ -22,14 +22,14 @@ class HolderRecheckPrerequisitesViewModelTest {
 
     private val orchestrator by lazy {
         FakeOrchestrator(
-            initialHolderState = sessionState,
+            initialHolderState = sessionState
         )
     }
 
     private val model by lazy {
         HolderRecheckPrerequisitesViewModel(
             dispatcher = dispatcherRule.testDispatcher,
-            orchestrator = orchestrator,
+            orchestrator = orchestrator
         )
     }
 

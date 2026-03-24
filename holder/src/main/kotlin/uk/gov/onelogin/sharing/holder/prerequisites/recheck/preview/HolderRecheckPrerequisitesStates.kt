@@ -19,28 +19,26 @@ internal class HolderRecheckPrerequisitesStates :
 
     companion object {
         internal val unauthorizedBluetoothPermission = Prerequisite.BLUETOOTH to
-                PrerequisiteResponse.Unauthorized(
-                    UnauthorizedReason.MissingPermissions(Manifest.permission.BLUETOOTH)
-                )
+            PrerequisiteResponse.Unauthorized(
+                UnauthorizedReason.MissingPermissions(Manifest.permission.BLUETOOTH)
+            )
         internal val unauthorizedCameraPermission = Prerequisite.CAMERA to
-                PrerequisiteResponse.Unauthorized(
-                    UnauthorizedReason.MissingPermissions(Manifest.permission.CAMERA)
-                )
+            PrerequisiteResponse.Unauthorized(
+                UnauthorizedReason.MissingPermissions(Manifest.permission.CAMERA)
+            )
     }
 
-    private fun deniedBluetoothPermissionState(
-        isPermanentlyDenied: Boolean = false,
-    ) = FakePermissionState(
-        Manifest.permission.BLUETOOTH,
-        PermissionStatus.Denied(!isPermanentlyDenied)
-    )
+    private fun deniedBluetoothPermissionState(isPermanentlyDenied: Boolean = false) =
+        FakePermissionState(
+            Manifest.permission.BLUETOOTH,
+            PermissionStatus.Denied(!isPermanentlyDenied)
+        )
 
-    private fun deniedCameraPermissionState(
-        isPermanentlyDenied: Boolean = false,
-    ) = FakePermissionState(
-        Manifest.permission.CAMERA,
-        PermissionStatus.Denied(!isPermanentlyDenied)
-    )
+    private fun deniedCameraPermissionState(isPermanentlyDenied: Boolean = false) =
+        FakePermissionState(
+            Manifest.permission.CAMERA,
+            PermissionStatus.Denied(!isPermanentlyDenied)
+        )
 
     private val data =
         listOf<Triple<String, Map<Prerequisite, PrerequisiteResponse>, List<PermissionState>>>(
@@ -77,7 +75,7 @@ internal class HolderRecheckPrerequisitesStates :
                 "Multiple: Denied permission",
                 mapOf(
                     unauthorizedBluetoothPermission,
-                    unauthorizedCameraPermission,
+                    unauthorizedCameraPermission
                 ),
                 listOf(
                     deniedBluetoothPermissionState(),
@@ -88,13 +86,13 @@ internal class HolderRecheckPrerequisitesStates :
                 "Multiple: Permanently Denied single permission",
                 mapOf(
                     unauthorizedBluetoothPermission,
-                    unauthorizedCameraPermission,
+                    unauthorizedCameraPermission
                 ),
                 listOf(
                     deniedBluetoothPermissionState(),
                     deniedCameraPermissionState(isPermanentlyDenied = true)
                 )
-            ),
+            )
         ).map { (name, responseMap, permissionStates) ->
             HolderRecheckPrerequisitesStatesEntry(
                 name = name,

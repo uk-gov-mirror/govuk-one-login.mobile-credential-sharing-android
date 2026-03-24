@@ -1,8 +1,8 @@
 package uk.gov.onelogin.sharing.holder.res.values
 
 import androidx.annotation.StringRes
-import uk.gov.onelogin.sharing.holder.R
 import uk.gov.onelogin.sharing.core.R as coreR
+import uk.gov.onelogin.sharing.holder.R
 
 /**
  * Test data used with [StringsXmlTest] for resource IDs that defer to another string resource.
@@ -56,5 +56,5 @@ enum class DeferredStringsXmlData(
     RECHECK_PREREQUISITES_UNSUPPORTED_JOURNEY(
         defersTo = coreR.string.unsupported_journey,
         resourceId = R.string.recheck_prerequisites_unsupported_journey
-    ),
+    )
 }

@@ -22,15 +22,15 @@ import uk.gov.android.ui.theme.m3.GdsTheme
 import uk.gov.onelogin.sharing.core.presentation.ButtonTestTags.PERMISSION_PERMANENT_DENIAL_BUTTON
 
 fun openSettingsIntent(context: Context): Intent = Intent(
-        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-        Uri.fromParts(
-            "package",
-            context.packageName,
-            null
-        )
-    ).apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+    Uri.fromParts(
+        "package",
+        context.packageName,
+        null
+    )
+).apply {
+    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+}
 
 @Composable
 fun PermanentPermissionDenialButton(

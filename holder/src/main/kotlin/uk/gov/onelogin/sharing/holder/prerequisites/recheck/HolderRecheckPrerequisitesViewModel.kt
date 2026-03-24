@@ -20,7 +20,7 @@ import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
 @ViewModelKey(HolderRecheckPrerequisitesViewModel::class)
 class HolderRecheckPrerequisitesViewModel(
     private val orchestrator: Orchestrator.Holder,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : ViewModel() {
 
     private val _holderUpdatedState = MutableStateFlow<HolderSessionState?>(null)

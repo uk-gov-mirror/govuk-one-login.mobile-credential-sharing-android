@@ -80,12 +80,12 @@ class HolderRecheckPrerequisitesScreenTest {
     fun `Permissions are initially denied`(
         missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
         permissionStates: List<PermissionState>,
-        getExpectedTitle: (Resources) -> String,
+        getExpectedTitle: (Resources) -> String
     ) = runTest(dispatcherRule.testDispatcher) {
         performJourney(
             missingPrerequisites = missingPrerequisites,
             permissionStates = permissionStates,
-            getExpectedTitle = getExpectedTitle,
+            getExpectedTitle = getExpectedTitle
         ) { resources ->
             resources.getString(R.string.recheck_prerequisites_try_again)
         }
@@ -100,12 +100,12 @@ class HolderRecheckPrerequisitesScreenTest {
     fun `Permanent permission denial opens the app settings`(
         missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
         permissionStates: List<PermissionState>,
-        getExpectedTitle: (Resources) -> String,
+        getExpectedTitle: (Resources) -> String
     ) = runTest(dispatcherRule.testDispatcher) {
         performJourney(
             missingPrerequisites = missingPrerequisites,
             permissionStates = permissionStates,
-            getExpectedTitle = getExpectedTitle,
+            getExpectedTitle = getExpectedTitle
         ) { resources ->
             resources.getString(R.string.recheck_prerequisites_open_app_permissions)
         }
@@ -117,7 +117,7 @@ class HolderRecheckPrerequisitesScreenTest {
         missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
         permissionStates: List<PermissionState>,
         getExpectedTitle: (Resources) -> String,
-        getPrimaryButtonText: (Resources) -> String,
+        getPrimaryButtonText: (Resources) -> String
     ) = composeTestRule.run {
         setContent {
             Render(
@@ -139,7 +139,7 @@ class HolderRecheckPrerequisitesScreenTest {
 
     private fun createViewModel(
         orchestrator: Orchestrator.Holder = this.orchestrator,
-        dispatcher: CoroutineDispatcher = dispatcherRule.testDispatcher,
+        dispatcher: CoroutineDispatcher = dispatcherRule.testDispatcher
     ) = HolderRecheckPrerequisitesViewModel(
         dispatcher = dispatcher,
         orchestrator = orchestrator
@@ -148,7 +148,7 @@ class HolderRecheckPrerequisitesScreenTest {
     @Composable
     fun Render(
         missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
-        multiplePermissionsState: MultiplePermissionsState,
+        multiplePermissionsState: MultiplePermissionsState
     ) {
         viewModel = createViewModel()
 
@@ -168,9 +168,8 @@ class HolderRecheckPrerequisitesScreenTest {
     }
 }
 
-class HolderRecheckPrerequisitesScreenRule(
-    composeTestRule: ComposeContentTestRule,
-) : ComposeContentTestRule by composeTestRule {
+class HolderRecheckPrerequisitesScreenRule(composeTestRule: ComposeContentTestRule) :
+    ComposeContentTestRule by composeTestRule {
 
     var hasHandledPreflight: Boolean = false
     var hasPresentedEngagement: Boolean = false
@@ -184,7 +183,7 @@ class HolderRecheckPrerequisitesScreenRule(
      * `holder` gradle module.
      */
     fun openAppSettingsIsIntended(
-        packageData: String = "package:uk.gov.onelogin.sharing.holder.test",
+        packageData: String = "package:uk.gov.onelogin.sharing.holder.test"
     ) = intended(
         allOf(
             hasAction("android.settings.APPLICATION_DETAILS_SETTINGS"),

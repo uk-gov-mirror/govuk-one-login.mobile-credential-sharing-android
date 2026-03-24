@@ -1,7 +1,7 @@
 plugins {
     listOf(
         libs.plugins.templates.android.library,
-        libs.plugins.kotlin.serialization,
+        libs.plugins.kotlin.serialization
     ).forEach { alias(it) }
 }
 

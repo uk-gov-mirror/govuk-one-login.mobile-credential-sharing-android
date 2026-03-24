@@ -36,5 +36,5 @@ enum class StringsXmlData(val expected: String, @param:StringRes val resourceId:
     HAVE_NOT_MET_REQUIREMENTS(
         expected = "Haven’t met requirements…",
         resourceId = R.string.have_not_met_requirements
-    ),
+    )
 }

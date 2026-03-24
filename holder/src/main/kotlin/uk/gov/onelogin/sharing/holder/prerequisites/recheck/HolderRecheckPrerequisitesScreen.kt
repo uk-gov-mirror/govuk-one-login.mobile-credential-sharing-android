@@ -51,7 +51,7 @@ internal fun HolderRecheckPrerequisitesScreen(
         viewModel.checkPrerequisites()
     },
     onHandlePreflight: (Map<Prerequisite, PrerequisiteResponse>) -> Unit = {},
-    onPresentEngagement: () -> Unit = {},
+    onPresentEngagement: () -> Unit = {}
 ) {
     val currentOnHandlePreflight by rememberUpdatedState(onHandlePreflight)
     val currentOnPresentEngagement by rememberUpdatedState(onPresentEngagement)
@@ -68,9 +68,9 @@ internal fun HolderRecheckPrerequisitesScreen(
             calculateButtonActionFrom(
                 context = context,
                 missingPrerequisites,
-                multiplePermissionsState,
+                multiplePermissionsState
             )
-        },
+        }
     )
 
     DisposableEffect(state) {
@@ -106,7 +106,7 @@ internal fun HolderRecheckPrerequisitesContent(
     missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
     buttonText: String,
     modifier: Modifier = Modifier,
-    onTryAgainClick: () -> Unit = {},
+    onTryAgainClick: () -> Unit = {}
 ) {
     val title = calculateTitleFrom(missingPrerequisites)
     ErrorScreen(
@@ -147,7 +147,7 @@ internal fun HolderRecheckPrerequisitesContent(
 private fun calculateButtonActionFrom(
     context: Context,
     missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
-    permissionContract: MultiplePermissionsState,
+    permissionContract: MultiplePermissionsState
 ) {
     val missingPermissions = missingPrerequisites.getMissingPermissions()
 
@@ -159,36 +159,35 @@ private fun calculateButtonActionFrom(
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
-private fun calculateButtonTextFrom(
-    permissionState: MultiplePermissionsState
-): Int = if (permissionState.isPermanentlyDenied()) {
-    R.string.recheck_prerequisites_open_app_permissions
-} else {
-    R.string.recheck_prerequisites_try_again
-}
+private fun calculateButtonTextFrom(permissionState: MultiplePermissionsState): Int =
+    if (permissionState.isPermanentlyDenied()) {
+        R.string.recheck_prerequisites_open_app_permissions
+    } else {
+        R.string.recheck_prerequisites_try_again
+    }
 
 @Composable
 private fun calculateTitleFrom(
-    missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
-): String {
+    missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>
+): String = if (missingPrerequisites.size == 1) {
+    val prerequisite = missingPrerequisites.keys.first()
+    when (missingPrerequisites.values.first()) {
+        is PrerequisiteResponse.Unauthorized ->
+            stringResource(
+                R.string.recheck_prerequisites_missing_prerequisite_permissions,
+                prerequisite.titleCaseName
+            )
 
-    return if (missingPrerequisites.size == 1) {
-        val prerequisite = missingPrerequisites.keys.first()
-        when (missingPrerequisites.values.first()) {
-            is PrerequisiteResponse.Unauthorized ->
-                stringResource(
-                    R.string.recheck_prerequisites_missing_prerequisite_permissions,
-                    prerequisite.titleCaseName
-                )
-            is PrerequisiteResponse.Incapable ->
-                stringResource(R.string.recheck_prerequisites_unsupported_journey)
-            is PrerequisiteResponse.NotReady ->
-                stringResource(R.string.recheck_prerequisites_phone_is_not_ready)
-            else -> ""
-        }
-    } else {
-        stringResource(R.string.recheck_prerequisites_multiple_prerequisites_not_met)
+        is PrerequisiteResponse.Incapable ->
+            stringResource(R.string.recheck_prerequisites_unsupported_journey)
+
+        is PrerequisiteResponse.NotReady ->
+            stringResource(R.string.recheck_prerequisites_phone_is_not_ready)
+
+        else -> ""
     }
+} else {
+    stringResource(R.string.recheck_prerequisites_multiple_prerequisites_not_met)
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -196,7 +195,7 @@ private fun calculateTitleFrom(
 @Preview(showBackground = true)
 internal fun HolderRecheckPrerequisitesPreview(
     @PreviewParameter(HolderRecheckPrerequisitesStates::class)
-    entry: HolderRecheckPrerequisitesStatesEntry,
+    entry: HolderRecheckPrerequisitesStatesEntry
 ) {
     GdsTheme {
         HolderRecheckPrerequisitesContent(
