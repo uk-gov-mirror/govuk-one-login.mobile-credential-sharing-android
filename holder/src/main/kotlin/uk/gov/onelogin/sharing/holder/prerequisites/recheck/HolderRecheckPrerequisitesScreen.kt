@@ -16,23 +16,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import dev.zacsweers.metro.ContributesIntoMap
-import dev.zacsweers.metro.binding
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import dev.zacsweers.metrox.viewmodel.metroViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import uk.gov.android.ui.componentsv2.button.ButtonTypeV2
 import uk.gov.android.ui.componentsv2.button.GdsButton
 import uk.gov.android.ui.componentsv2.heading.GdsHeading
@@ -41,39 +29,14 @@ import uk.gov.android.ui.componentsv2.images.GdsIcon
 import uk.gov.android.ui.patterns.errorscreen.v2.ErrorScreen
 import uk.gov.android.ui.patterns.errorscreen.v2.ErrorScreenIcon
 import uk.gov.android.ui.theme.m3.GdsTheme
-import uk.gov.onelogin.sharing.core.HolderUiScope
 import uk.gov.onelogin.sharing.core.presentation.buttons.openSettingsIntent
 import uk.gov.onelogin.sharing.holder.R
 import uk.gov.onelogin.sharing.holder.prerequisites.recheck.preview.HolderRecheckPrerequisitesStates
 import uk.gov.onelogin.sharing.holder.prerequisites.recheck.preview.HolderRecheckPrerequisitesStatesEntry
 import uk.gov.onelogin.sharing.holder.presentation.isPermanentlyDenied
-import uk.gov.onelogin.sharing.orchestration.Orchestrator
 import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
 import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
-
-@ContributesIntoMap(HolderUiScope::class, binding = binding<ViewModel>())
-@ViewModelKey(HolderRecheckPrerequisitesViewModel::class)
-class HolderRecheckPrerequisitesViewModel(
-    private val orchestrator: Orchestrator.Holder,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
-) : ViewModel() {
-
-    private val _holderUpdatedState = MutableStateFlow<HolderSessionState?>(null)
-    val holderUpdatedState: StateFlow<HolderSessionState?> = _holderUpdatedState
-
-    fun checkPrerequisites(): Job = viewModelScope.launch(dispatcher) {
-        orchestrator.checkPrerequisites().also {
-            orchestrator.holderSessionState.collect { sessionState ->
-                _holderUpdatedState.update { sessionState }
-            }
-        }
-    }
-
-    fun clearState(): Job = viewModelScope.launch(dispatcher) {
-        _holderUpdatedState.update { null }
-    }
-}
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
