@@ -24,59 +24,9 @@ class RecheckPrerequisitesInitiallyDeniedPermissionParameters : TestParametersVa
 
     override fun provideValues(context: Context?): List<TestParameters.TestParametersValues?>? =
         listOf(
-            RecheckPrerequisitesInitiallyDeniedPermissionState(
-                name = "Bluetooth initially denied",
-                missingPrerequisites = mapOf(
-                    HolderRecheckPrerequisitesStates.Companion.unauthorizedBluetoothPermission
-                ),
-                permissionStates = listOf(
-                    FakePermissionState(
-                        permission = Manifest.permission.BLUETOOTH,
-                        status = PermissionStatus.Denied(true)
-                    )
-                )
-            ) { resources ->
-                resources.getString(
-                    R.string.recheck_prerequisites_missing_prerequisite_permissions,
-                    Prerequisite.BLUETOOTH.titleCaseName
-                )
-            },
-            RecheckPrerequisitesInitiallyDeniedPermissionState(
-                name = "Camera initially denied",
-                missingPrerequisites = mapOf(
-                    HolderRecheckPrerequisitesStates.Companion.unauthorizedCameraPermission
-                ),
-                permissionStates = listOf(
-                    FakePermissionState(
-                        permission = Manifest.permission.CAMERA,
-                        status = PermissionStatus.Denied(true)
-                    )
-                )
-            ) { resources ->
-                resources.getString(
-                    R.string.recheck_prerequisites_missing_prerequisite_permissions,
-                    Prerequisite.CAMERA.titleCaseName
-                )
-            },
-            RecheckPrerequisitesInitiallyDeniedPermissionState(
-                name = "Multiple permissions denied",
-                missingPrerequisites = mapOf(
-                    HolderRecheckPrerequisitesStates.Companion.unauthorizedBluetoothPermission,
-                    HolderRecheckPrerequisitesStates.Companion.unauthorizedCameraPermission
-                ),
-                permissionStates = listOf(
-                    FakePermissionState(
-                        permission = Manifest.permission.BLUETOOTH,
-                        status = PermissionStatus.Denied(true)
-                    ),
-                    FakePermissionState(
-                        permission = Manifest.permission.CAMERA,
-                        status = PermissionStatus.Denied(true)
-                    )
-                )
-            ) { resources ->
-                resources.getString(R.string.recheck_prerequisites_multiple_prerequisites_not_met)
-            }
+            bluetoothInitialDenial,
+            cameraInitialDenial,
+            multipleInitialDenials
         ).map { data ->
             TestParameters.TestParametersValues.builder()
                 .name(data.name)
@@ -85,4 +35,62 @@ class RecheckPrerequisitesInitiallyDeniedPermissionParameters : TestParametersVa
                 .addParameter("getExpectedTitle", data.expectedTitle)
                 .build()
         }
+
+    companion object {
+        private val bluetoothInitialDenial = RecheckPrerequisitesInitiallyDeniedPermissionState(
+            name = "Bluetooth initially denied",
+            missingPrerequisites = mapOf(
+                HolderRecheckPrerequisitesStates.Companion.unauthorizedBluetoothPermission
+            ),
+            permissionStates = listOf(
+                FakePermissionState(
+                    permission = Manifest.permission.BLUETOOTH,
+                    status = PermissionStatus.Denied(true)
+                )
+            )
+        ) { resources ->
+            resources.getString(
+                R.string.recheck_prerequisites_missing_prerequisite_permissions,
+                Prerequisite.BLUETOOTH.titleCaseName
+            )
+        }
+
+        private val cameraInitialDenial = RecheckPrerequisitesInitiallyDeniedPermissionState(
+            name = "Camera initially denied",
+            missingPrerequisites = mapOf(
+                HolderRecheckPrerequisitesStates.Companion.unauthorizedCameraPermission
+            ),
+            permissionStates = listOf(
+                FakePermissionState(
+                    permission = Manifest.permission.CAMERA,
+                    status = PermissionStatus.Denied(true)
+                )
+            )
+        ) { resources ->
+            resources.getString(
+                R.string.recheck_prerequisites_missing_prerequisite_permissions,
+                Prerequisite.CAMERA.titleCaseName
+            )
+        }
+
+        private val multipleInitialDenials = RecheckPrerequisitesInitiallyDeniedPermissionState(
+            name = "Multiple permissions denied",
+            missingPrerequisites = mapOf(
+                HolderRecheckPrerequisitesStates.Companion.unauthorizedBluetoothPermission,
+                HolderRecheckPrerequisitesStates.Companion.unauthorizedCameraPermission
+            ),
+            permissionStates = listOf(
+                FakePermissionState(
+                    permission = Manifest.permission.BLUETOOTH,
+                    status = PermissionStatus.Denied(true)
+                ),
+                FakePermissionState(
+                    permission = Manifest.permission.CAMERA,
+                    status = PermissionStatus.Denied(true)
+                )
+            )
+        ) { resources ->
+            resources.getString(R.string.recheck_prerequisites_multiple_prerequisites_not_met)
+        }
+    }
 }
