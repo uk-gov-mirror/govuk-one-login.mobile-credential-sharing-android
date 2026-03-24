@@ -31,6 +31,7 @@ class ValidHolderSessionStateTransitions : TestParametersValuesProvider() {
             )
         }
         private val preflightTransitions = listOf(
+            "Fails rechecking prerequisites" to preflightEmptyPermissions,
             "User cancels during permission request" to userCancellation,
             "User permanently denies requested permissions" to userJourneyFailure,
             "User allows all requested permissions" to HolderSessionState.ReadyToPresent
