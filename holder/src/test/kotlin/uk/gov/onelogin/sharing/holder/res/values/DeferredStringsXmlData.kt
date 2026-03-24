@@ -33,8 +33,28 @@ enum class DeferredStringsXmlData(
         defersTo = coreR.string.open_app_permissions,
         resourceId = R.string.holder_welcome_open_app_permissions
     ),
+    RECHECK_PREREQUISITES_MISSING_PREREQUISITE_PERMISSIONS(
+        defersTo = coreR.string.missing_prerequisite_permissions,
+        resourceId = R.string.recheck_prerequisites_missing_prerequisite_permissions
+    ),
+    RECHECK_PREREQUISITES_MULTIPLE_PREREQUISITES_NOT_MET(
+        defersTo = coreR.string.prerequisites_not_met,
+        resourceId = R.string.recheck_prerequisites_multiple_prerequisites_not_met
+    ),
+    RECHECK_PREREQUISITES_OPEN_APP_PERMISSIONS(
+        defersTo = coreR.string.open_app_permissions,
+        resourceId = R.string.recheck_prerequisites_open_app_permissions
+    ),
+    RECHECK_PREREQUISITES_PHONE_IS_NOT_READY(
+        defersTo = coreR.string.phone_is_not_ready,
+        resourceId = R.string.recheck_prerequisites_phone_is_not_ready
+    ),
     RECHECK_PREREQUISITES_TRY_AGAIN(
         defersTo = coreR.string.try_again,
         resourceId = R.string.recheck_prerequisites_try_again
-    )
+    ),
+    RECHECK_PREREQUISITES_UNSUPPORTED_JOURNEY(
+        defersTo = coreR.string.unsupported_journey,
+        resourceId = R.string.recheck_prerequisites_unsupported_journey
+    ),
 }

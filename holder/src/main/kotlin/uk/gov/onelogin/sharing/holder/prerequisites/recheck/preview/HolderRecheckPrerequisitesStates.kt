@@ -17,14 +17,16 @@ import uk.gov.onelogin.sharing.orchestration.prerequisites.authorization.Unautho
 internal class HolderRecheckPrerequisitesStates :
     PreviewParameterProvider<HolderRecheckPrerequisitesStatesEntry> {
 
-    private val unauthorizedBluetoothPermission = Prerequisite.BLUETOOTH to
-            PrerequisiteResponse.Unauthorized(
-                UnauthorizedReason.MissingPermissions(Manifest.permission.BLUETOOTH)
-            )
-    private val unauthorizedCameraPermission = Prerequisite.CAMERA to
-            PrerequisiteResponse.Unauthorized(
-                UnauthorizedReason.MissingPermissions(Manifest.permission.CAMERA)
-            )
+    companion object {
+        internal val unauthorizedBluetoothPermission = Prerequisite.BLUETOOTH to
+                PrerequisiteResponse.Unauthorized(
+                    UnauthorizedReason.MissingPermissions(Manifest.permission.BLUETOOTH)
+                )
+        internal val unauthorizedCameraPermission = Prerequisite.CAMERA to
+                PrerequisiteResponse.Unauthorized(
+                    UnauthorizedReason.MissingPermissions(Manifest.permission.CAMERA)
+                )
+    }
 
     private fun deniedBluetoothPermissionState(
         isPermanentlyDenied: Boolean = false,

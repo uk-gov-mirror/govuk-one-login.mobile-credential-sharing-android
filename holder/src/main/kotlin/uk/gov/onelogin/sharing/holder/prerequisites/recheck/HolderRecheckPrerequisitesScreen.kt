@@ -12,6 +12,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,10 +41,15 @@ import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HolderRecheckPrerequisitesScreen(
+internal fun HolderRecheckPrerequisitesScreen(
     missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
     modifier: Modifier = Modifier,
     viewModel: HolderRecheckPrerequisitesViewModel = metroViewModel(),
+    multiplePermissionsState: MultiplePermissionsState = rememberMultiplePermissionsState(
+        missingPrerequisites.getMissingPermissions()
+    ) {
+        viewModel.checkPrerequisites()
+    },
     onHandlePreflight: (Map<Prerequisite, PrerequisiteResponse>) -> Unit = {},
     onPresentEngagement: () -> Unit = {},
 ) {
@@ -51,12 +57,6 @@ fun HolderRecheckPrerequisitesScreen(
     val currentOnPresentEngagement by rememberUpdatedState(onPresentEngagement)
     val context = LocalContext.current
     val state by viewModel.holderUpdatedState.collectAsStateWithLifecycle()
-
-    val multiplePermissionsState = rememberMultiplePermissionsState(
-        missingPrerequisites.getMissingPermissions()
-    ) {
-        viewModel.checkPrerequisites()
-    }
 
     HolderRecheckPrerequisitesContent(
         buttonText = stringResource(
@@ -102,7 +102,7 @@ fun Map<Prerequisite, PrerequisiteResponse>.getMissingPermissions(): List<String
     .flatMap { it.getMissingPermissions() }
 
 @Composable
-fun HolderRecheckPrerequisitesContent(
+internal fun HolderRecheckPrerequisitesContent(
     missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
     buttonText: String,
     modifier: Modifier = Modifier,
@@ -125,6 +125,7 @@ fun HolderRecheckPrerequisitesContent(
             GdsHeading(
                 text = title,
                 modifier = Modifier
+                    .testTag("title")
                     .padding(horizontal = horizontalPadding),
                 textAlign = GdsHeadingAlignment.CenterAligned
             )
@@ -134,7 +135,9 @@ fun HolderRecheckPrerequisitesContent(
                 text = buttonText,
                 buttonType = ButtonTypeV2.Primary(),
                 onClick = onTryAgainClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .testTag("primaryButton")
+                    .fillMaxWidth()
             )
         }
     )
@@ -175,7 +178,7 @@ private fun calculateTitleFrom(
             is PrerequisiteResponse.Unauthorized ->
                 stringResource(
                     R.string.recheck_prerequisites_missing_prerequisite_permissions,
-                    prerequisite.name.lowercase().replaceFirstChar(Char::uppercase)
+                    prerequisite.titleCaseName
                 )
             is PrerequisiteResponse.Incapable ->
                 stringResource(R.string.recheck_prerequisites_unsupported_journey)
@@ -184,14 +187,14 @@ private fun calculateTitleFrom(
             else -> ""
         }
     } else {
-        "Prerequisites not met"
+        stringResource(R.string.recheck_prerequisites_multiple_prerequisites_not_met)
     }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 @Preview(showBackground = true)
-fun HolderRecheckPrerequisitesPreview(
+internal fun HolderRecheckPrerequisitesPreview(
     @PreviewParameter(HolderRecheckPrerequisitesStates::class)
     entry: HolderRecheckPrerequisitesStatesEntry,
 ) {

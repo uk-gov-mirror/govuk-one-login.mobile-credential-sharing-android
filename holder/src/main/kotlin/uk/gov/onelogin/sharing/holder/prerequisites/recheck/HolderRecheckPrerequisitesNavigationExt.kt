@@ -7,6 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import uk.gov.onelogin.sharing.holder.presentation.HolderPresentQrNavigationExt.navigateToHolderPresentQrScreen
 import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
@@ -22,6 +23,7 @@ object HolderRecheckPrerequisitesNavigationExt {
         options
     )
 
+    @OptIn(ExperimentalPermissionsApi::class)
     internal fun NavGraphBuilder.configureHolderRecheckPrerequisitesScreen(
         controller: NavController
     ) {
