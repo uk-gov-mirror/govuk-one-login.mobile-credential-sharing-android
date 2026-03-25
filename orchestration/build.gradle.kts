@@ -35,8 +35,8 @@ dependencies {
         libs.androidx.camera.lifecycle,
         projects.bluetooth,
         projects.core,
-        projects.security,
-        projects.cameraService
+        projects.cameraService,
+        projects.cryptoService
     ).forEach(::api)
 
     listOf(projects.models)
@@ -44,21 +44,23 @@ dependencies {
 
     listOf(
         libs.com.google.guava.android,
-        libs.bundles.androidx.camera
+        libs.bundles.androidx.camera,
+        libs.metro.viewmodel.compose
     ).forEach(::implementation)
 
     listOf(
         libs.com.google.test.parameter.injector,
         libs.junit,
+        projects.cameraService,
         projects.models,
-        testFixtures(projects.security)
+        testFixtures(projects.cryptoService)
     ).forEach(::testFixturesApi)
 
     listOf(
         libs.bundles.androidx.camera,
         testFixtures(projects.bluetooth),
         testFixtures(projects.core),
-        testFixtures(projects.security)
+        testFixtures(projects.cryptoService)
     ).forEach(::testImplementation)
 }
 

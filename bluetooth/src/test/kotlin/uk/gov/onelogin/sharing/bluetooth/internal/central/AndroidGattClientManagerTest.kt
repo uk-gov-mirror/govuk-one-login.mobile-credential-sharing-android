@@ -569,8 +569,8 @@ internal class AndroidGattClientManagerTest {
         every { service.getCharacteristic(GattUuids.STATE_UUID) } returns stateCharacteristic
 
         testEvents {
-            manager.writeSessionEnd()
-            assertEquals(GattClientEvent.SessionEnd(SessionEndStates.SUCCESS), awaitItem())
+            val result = manager.notifySessionEnd()
+            assertEquals(SessionEndStates.SUCCESS, result)
         }
     }
 
@@ -586,11 +586,8 @@ internal class AndroidGattClientManagerTest {
         every { service.getCharacteristic(GattUuids.STATE_UUID) } returns stateCharacteristic
 
         testEvents {
-            manager.writeSessionEnd()
-            assertEquals(
-                GattClientEvent.SessionEnd(SessionEndStates.WRITE_TO_SERVER_FAILED),
-                awaitItem()
-            )
+            val result = manager.notifySessionEnd()
+            assertEquals(SessionEndStates.WRITE_TO_SERVER_FAILED, result)
         }
     }
 

@@ -5,6 +5,6 @@ import uk.gov.onelogin.sharing.sdk.api.shared.CredentialSharingAppGraph
 import uk.gov.onelogin.sharing.sdk.api.verifier.CredentialVerifier
 
 class FakeCredentialVerifier(
-    override val appGraph: CredentialSharingAppGraph,
-    override val orchestrator: Orchestrator.Verifier
+    override val orchestrator: Orchestrator.Verifier,
+    override val appGraph: CredentialSharingAppGraph
 ) : CredentialVerifier

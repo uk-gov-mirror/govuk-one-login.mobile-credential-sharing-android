@@ -4,24 +4,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import dev.zacsweers.metrox.viewmodel.metroViewModel
-import uk.gov.android.ui.componentsv2.camera.qr.BarcodeScanResult
-import uk.gov.onelogin.sharing.cameraService.scan.QrScannerCallback
 import uk.gov.onelogin.sharing.verifier.VerifierNavigationEvents
+import uk.gov.onelogin.sharing.verifier.scan.state.VerifierUiState
 
 @Composable
 fun VerifierScanner(
-    modifier: Modifier = Modifier,
     viewModel: VerifierScannerViewModel = metroViewModel(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     onInvalidBarcode: (String) -> Unit = {},
-    onValidBarcode: (String) -> Unit = {}
+    onValidBarcode: () -> Unit = {},
+    content: @Composable () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val currentOnInvalidBarcode by rememberUpdatedState(onInvalidBarcode)
     val currentOnValidBarcode by rememberUpdatedState(onValidBarcode)
 
@@ -29,9 +30,7 @@ fun VerifierScanner(
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.navigationEvents.collect { event ->
                 when (event) {
-                    is VerifierNavigationEvents.NavigateToDiagnostic -> currentOnValidBarcode(
-                        event.qrCode
-                    )
+                    is VerifierNavigationEvents.NavigateToDiagnostic -> currentOnValidBarcode()
 
                     is VerifierNavigationEvents.NavigateToInvalidScreen -> currentOnInvalidBarcode(
                         event.qrCode
@@ -41,13 +40,7 @@ fun VerifierScanner(
         }
     }
 
-    val barcodeScanResultCallback: BarcodeScanResult.Callback = QrScannerCallback(
-        onQrDetected = viewModel::update
-    )
-
-    VerifierScannerContent(
-        lifecycleOwner = lifecycleOwner,
-        modifier = modifier,
-        barcodeScanResultCallback = barcodeScanResultCallback
-    )
+    if (uiState is VerifierUiState.StartScanner) {
+        content()
+    }
 }
