@@ -76,7 +76,7 @@ class HolderOrchestrator(
         }
     }
 
-    override fun checkPrerequisites() {
+    override fun performPreflightChecks() {
         try {
             prerequisiteGate.checkPrerequisites(
                 Prerequisite.BLUETOOTH
@@ -127,7 +127,7 @@ class HolderOrchestrator(
             return
         }
 
-        checkPrerequisites()
+        performPreflightChecks()
     }
 
     private fun handleStartPrerequisiteCheck(prerequisiteCheck: PrerequisiteResponse) {
@@ -154,7 +154,8 @@ class HolderOrchestrator(
                     HolderSessionState.Preflight(
                         mapOf(
                             Prerequisite.BLUETOOTH to prerequisiteCheck
-                        )
+                        ),
+                        onComplete = this::performPreflightChecks
                     )
                 )
         }

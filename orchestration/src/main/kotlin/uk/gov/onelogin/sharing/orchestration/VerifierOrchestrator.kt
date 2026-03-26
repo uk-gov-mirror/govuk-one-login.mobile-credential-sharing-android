@@ -71,7 +71,7 @@ class VerifierOrchestrator(
         }
     }
 
-    override fun checkPrerequisites() {
+    override fun performPreflightChecks() {
         try {
             val prerequisites = listOf(
                 Prerequisite.BLUETOOTH,
@@ -131,7 +131,7 @@ class VerifierOrchestrator(
             return
         }
 
-        checkPrerequisites()
+        performPreflightChecks()
     }
 
     private fun handleStartPrerequisiteFailure(

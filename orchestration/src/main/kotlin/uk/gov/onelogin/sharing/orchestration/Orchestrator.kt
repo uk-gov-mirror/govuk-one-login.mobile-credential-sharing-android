@@ -12,7 +12,7 @@ import uk.gov.onelogin.sharing.orchestration.verifier.session.VerifierSessionSta
  * Implements [Resettable] for clearing internal state, such as the session state machines.
  */
 interface Orchestrator : Resettable {
-    fun checkPrerequisites()
+    fun performPreflightChecks()
 
     /**
      * Begins the User journey.

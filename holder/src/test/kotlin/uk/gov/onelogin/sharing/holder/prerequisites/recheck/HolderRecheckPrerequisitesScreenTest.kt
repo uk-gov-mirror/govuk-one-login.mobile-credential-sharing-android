@@ -24,7 +24,9 @@ import com.google.testing.junit.testparameterinjector.TestParameters
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.After
@@ -42,7 +44,7 @@ import uk.gov.onelogin.sharing.orchestration.holder.session.HolderSessionState
 import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestParameterInjector::class)
 class HolderRecheckPrerequisitesScreenTest {
 
@@ -55,7 +57,8 @@ class HolderRecheckPrerequisitesScreenTest {
     private val resources: Resources = ApplicationProvider.getApplicationContext<Context>()
         .resources
 
-    private var holderSessionState = HolderSessionState.PresentingEngagement("")
+    private var holderSessionState: HolderSessionState =
+        HolderSessionState.PresentingEngagement("")
 
     private val orchestrator by lazy {
         FakeOrchestrator(
@@ -90,6 +93,9 @@ class HolderRecheckPrerequisitesScreenTest {
             resources.getString(R.string.recheck_prerequisites_try_again)
         }
 
+        composeTestRule.waitForIdle()
+        advanceUntilIdle()
+
         assertTrue { composeTestRule.hasPresentedEngagement }
     }
 
@@ -119,10 +125,11 @@ class HolderRecheckPrerequisitesScreenTest {
         getExpectedTitle: (Resources) -> String,
         getPrimaryButtonText: (Resources) -> String
     ) = composeTestRule.run {
+        val preflightState = HolderSessionState.Preflight(missingPrerequisites)
+        holderSessionState = preflightState
         setContent {
             Render(
-                missingPrerequisites = missingPrerequisites,
-                multiplePermissionsState = FakeMultiplePermissionsState(
+                permissionsState = FakeMultiplePermissionsState(
                     permissionStates
                 ) {
                     viewModel.checkPrerequisites()
@@ -147,19 +154,14 @@ class HolderRecheckPrerequisitesScreenTest {
 
     @Composable
     fun Render(
-        missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
-        multiplePermissionsState: MultiplePermissionsState
+        permissionsState: MultiplePermissionsState
     ) {
         viewModel = createViewModel()
 
         GdsTheme {
             HolderRecheckPrerequisitesScreen(
-                missingPrerequisites = missingPrerequisites,
-                multiplePermissionsState = multiplePermissionsState,
                 viewModel = viewModel,
-                onHandlePreflight = {
-                    composeTestRule.hasHandledPreflight = true
-                },
+                permissionsState = permissionsState,
                 onPresentEngagement = {
                     composeTestRule.hasPresentedEngagement = true
                 }

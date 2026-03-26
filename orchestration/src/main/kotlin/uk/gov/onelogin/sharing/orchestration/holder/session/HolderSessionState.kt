@@ -30,7 +30,10 @@ sealed class HolderSessionState : Completable {
      * @param missingPrerequisites The list of [Prerequisite]s required to perform the journey in
      * it's entirety.
      */
-    data class Preflight(val missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>) :
+    data class Preflight(
+        val missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
+        val onComplete: () -> Unit = {},
+    ) :
         HolderSessionState()
 
     /**

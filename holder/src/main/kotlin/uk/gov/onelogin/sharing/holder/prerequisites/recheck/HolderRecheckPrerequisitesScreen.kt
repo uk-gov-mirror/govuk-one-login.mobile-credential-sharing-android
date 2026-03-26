@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -42,45 +43,43 @@ import uk.gov.onelogin.sharing.orchestration.prerequisites.PrerequisiteResponse
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun HolderRecheckPrerequisitesScreen(
-    missingPrerequisites: Map<Prerequisite, PrerequisiteResponse>,
     modifier: Modifier = Modifier,
     viewModel: HolderRecheckPrerequisitesViewModel = metroViewModel(),
-    multiplePermissionsState: MultiplePermissionsState = rememberMultiplePermissionsState(
-        missingPrerequisites.getMissingPermissions()
-    ) {
-        viewModel.checkPrerequisites()
-    },
-    onHandlePreflight: (Map<Prerequisite, PrerequisiteResponse>) -> Unit = {},
+    permissionsState: MultiplePermissionsState? = null,
     onPresentEngagement: () -> Unit = {}
 ) {
-    val currentOnHandlePreflight by rememberUpdatedState(onHandlePreflight)
     val currentOnPresentEngagement by rememberUpdatedState(onPresentEngagement)
     val context = LocalContext.current
     val state by viewModel.holderUpdatedState.collectAsStateWithLifecycle()
+    val missingPrerequisites = (state as? HolderSessionState.Preflight)?.missingPrerequisites
+    val multiplePermissionsState: MultiplePermissionsState = permissionsState
+        ?: rememberMultiplePermissionsState(
+        missingPrerequisites?.getMissingPermissions() ?: emptyList()
+    ) {
+        (state as? HolderSessionState.Preflight)?.onComplete()
+    }
 
-    HolderRecheckPrerequisitesContent(
-        buttonText = stringResource(
-            calculateButtonTextFrom(multiplePermissionsState)
-        ),
-        missingPrerequisites = missingPrerequisites,
-        modifier = modifier,
-        onTryAgainClick = {
-            calculateButtonActionFrom(
-                context = context,
-                missingPrerequisites,
-                multiplePermissionsState
-            )
-        }
-    )
+    if (missingPrerequisites == null) {
+        CircularProgressIndicator()
+    } else {
+        HolderRecheckPrerequisitesContent(
+            buttonText = stringResource(
+                calculateButtonTextFrom(multiplePermissionsState)
+            ),
+            missingPrerequisites = missingPrerequisites,
+            modifier = modifier,
+            onTryAgainClick = {
+                calculateButtonActionFrom(
+                    context = context,
+                    missingPrerequisites,
+                    multiplePermissionsState
+                )
+            }
+        )
+    }
 
     DisposableEffect(state) {
         when (state) {
-            is HolderSessionState.Preflight -> {
-                currentOnHandlePreflight(
-                    (state as HolderSessionState.Preflight).missingPrerequisites
-                )
-            }
-
             is HolderSessionState.PresentingEngagement -> {
                 currentOnPresentEngagement()
             }

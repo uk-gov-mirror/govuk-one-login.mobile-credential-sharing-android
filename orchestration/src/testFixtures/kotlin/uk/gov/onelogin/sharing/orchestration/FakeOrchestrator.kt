@@ -47,7 +47,7 @@ class FakeOrchestrator(
     var cancelCount = 0
     var prerequisiteCheckCount = 0
 
-    override fun checkPrerequisites() {
+    override fun performPreflightChecks() {
         prerequisiteCheckCount++
     }
 
