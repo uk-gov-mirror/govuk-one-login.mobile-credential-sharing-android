@@ -1,42 +1,45 @@
 package uk.gov.onelogin.sharing.cryptoService.verifier
 
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import uk.gov.logging.testdouble.v2.SystemLogger
 import uk.gov.onelogin.sharing.cryptoService.DecoderStub.VALID_ENCODED_DEVICE_ENGAGEMENT
-import uk.gov.onelogin.sharing.cryptoService.DecoderStub.VALID_TRANSCRIPT
-import uk.gov.onelogin.sharing.cryptoService.SessionEstablishmentStub.MOCK_E_READER_KEY
-import uk.gov.onelogin.sharing.cryptoService.cbor.encodeCbor
-import uk.gov.onelogin.sharing.cryptoService.cbor.serializers.EmbeddedCbor
+import uk.gov.onelogin.sharing.cryptoService.secureArea.keypair.EcKeyPairGenerator
 
 class VerifierCryptoServiceImplTest {
     private val logger = SystemLogger()
-    private val service = VerifierCryptoServiceImpl(logger)
+    private val service = VerifierCryptoServiceImpl(
+        logger = logger,
+        keyPairGenerator = EcKeyPairGenerator(logger)
+    )
 
     @Test
-    fun `processEngagement constructs SessionTranscriptBytes successfully`() = runTest {
-        val eReaderKeyTagged = MOCK_E_READER_KEY.hexToByteArray()
+    fun `processEngagement decorates context successfully`() = runTest {
+        var decoratedContext: VerifierCryptoContext? = null
 
-        val result = service.processEngagement(
-            VALID_ENCODED_DEVICE_ENGAGEMENT,
-            eReaderKeyTagged
-        )
+        service.processEngagement(VALID_ENCODED_DEVICE_ENGAGEMENT) {
+            decoratedContext = it
+            it
+        }
 
-        val expectedTranscriptBytes =
-            EmbeddedCbor(VALID_TRANSCRIPT.hexToByteArray()).encodeCbor()
-        assertEquals(expectedTranscriptBytes.toHexString(), result.toHexString())
-
+        val context = assertNotNull(decoratedContext)
+        assertEquals(VALID_ENCODED_DEVICE_ENGAGEMENT, context.engagementString)
+        assertNotNull(context.serviceUuid)
+        val eReaderKey = assertNotNull(context.eReaderKeyTagged)
+        assertTrue(eReaderKey[0] == 0xD8.toByte())
+        assertTrue(eReaderKey[1] == 0x18.toByte())
+        assertNotNull(context.sessionTranscriptBytes)
         assert("SessionTranscriptBytes constructed successfully" in logger)
     }
 
     @Test
     fun `processEngagement throws when DeviceEngagementBytes is blank`() = runTest {
-        val eReaderKeyTagged = MOCK_E_READER_KEY.hexToByteArray()
-
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            service.processEngagement("", eReaderKeyTagged)
+            service.processEngagement("") { it }
         }
 
         assertEquals("DeviceEngagementBytes must not be blank", exception.message)
@@ -44,16 +47,5 @@ class VerifierCryptoServiceImplTest {
             "error constructing SessionTranscript array due to " +
                 "DeviceEngagementBytes is blank" in logger
         )
-    }
-
-    @Test
-    fun `processEngagement throws when eReaderKeyTagged is not Tag 24`() = runTest {
-        val invalidEReaderKey = byteArrayOf(0x00, 0x01, 0x02)
-
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            service.processEngagement(VALID_ENCODED_DEVICE_ENGAGEMENT, invalidEReaderKey)
-        }
-
-        assertEquals("CBOR parsing error: eReaderKey must be tag(24)", exception.message)
     }
 }

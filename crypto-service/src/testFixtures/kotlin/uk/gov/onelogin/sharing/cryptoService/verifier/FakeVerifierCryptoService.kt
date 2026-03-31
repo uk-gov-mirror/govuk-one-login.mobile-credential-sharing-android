@@ -5,16 +5,20 @@ class FakeVerifierCryptoService : VerifierCryptoService {
         private set
     var lastQrCodeData: String? = null
         private set
-    var lastEReaderKeyTagged: ByteArray? = null
-        private set
-    var resultToReturn: ByteArray = byteArrayOf()
     var exceptionToThrow: Exception? = null
 
-    override fun processEngagement(qrCodeData: String, eReaderKeyTagged: ByteArray): ByteArray {
+    override fun processEngagement(
+        qrCodeData: String,
+        updateContext: (VerifierCryptoContext) -> VerifierCryptoContext
+    ) {
         processEngagementCallCount++
         lastQrCodeData = qrCodeData
-        lastEReaderKeyTagged = eReaderKeyTagged
         exceptionToThrow?.let { throw it }
-        return resultToReturn
+        updateContext(
+            VerifierCryptoContext(
+                engagementString = qrCodeData,
+                serviceUuid = byteArrayOf(1, 2, 3)
+            )
+        )
     }
 }
