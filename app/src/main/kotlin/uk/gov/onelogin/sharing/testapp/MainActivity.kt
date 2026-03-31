@@ -1,6 +1,7 @@
 package uk.gov.onelogin.sharing.testapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,6 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.security.cert.Certificate
 import javax.inject.Inject
 import uk.gov.android.ui.theme.m3.GdsTheme
+import uk.gov.logging.api.BuildConfig
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.DocumentType
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.RequestElement
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerificationRequest
@@ -53,6 +55,13 @@ class MainActivity : ComponentActivity() {
                     trustedCertificates = trustedCertificates
                 )
             )
+
+        if (BuildConfig.DEBUG) {
+            Log.d(
+                "Mock Credential",
+                MockCredentials.mockCredential(this).toString()
+            )
+        }
 
         setContent {
             GdsTheme {
