@@ -408,7 +408,7 @@ class VerifierOrchestratorTest {
     }
 
     @Test
-    fun `when crypto engagement fails, transport is stopped and session ends`() = runTest {
+    fun `when crypto engagement fails, transport is stopped`() = runTest {
         val validQrCode = VALID_MDOC_URI
 
         verifierCryptoService.exceptionToThrow = RuntimeException("Error processing engagement")
