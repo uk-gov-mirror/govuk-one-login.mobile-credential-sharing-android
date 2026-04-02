@@ -19,7 +19,6 @@ import uk.gov.onelogin.sharing.bluetooth.api.central.mdoc.CentralBluetoothState
 import uk.gov.onelogin.sharing.bluetooth.api.central.mdoc.CentralBluetoothTransportError
 import uk.gov.onelogin.sharing.bluetooth.api.central.mdoc.FakeCentralBluetoothTransport
 import uk.gov.onelogin.sharing.core.MainDispatcherRule
-import uk.gov.onelogin.sharing.core.data.UriTestData.mdocExampleUriOne
 import uk.gov.onelogin.sharing.cryptoService.DecoderStub.VALID_MDOC_URI
 import uk.gov.onelogin.sharing.cryptoService.scanner.FakeQrParser
 import uk.gov.onelogin.sharing.cryptoService.verifier.FakeVerifierCryptoService
@@ -405,6 +404,17 @@ class VerifierOrchestratorTest {
             orchestrator.verifierSessionState.value,
             isCancelled()
         )
+        assertEquals(1, centralBluetoothTransport.stopCalls)
+    }
+
+    @Test
+    fun `when crypto engagement fails, transport is stopped and session ends`() = runTest {
+        val validQrCode = VALID_MDOC_URI
+
+        verifierCryptoService.exceptionToThrow = RuntimeException("Error processing engagement")
+
+        orchestrator.processQrCode(validQrCode)
+
         assertEquals(1, centralBluetoothTransport.stopCalls)
     }
 }

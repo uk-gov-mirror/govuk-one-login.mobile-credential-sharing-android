@@ -171,6 +171,7 @@ class VerifierOrchestrator(
                     }
                 }.onFailure { e ->
                     failWith("Error processing engagement: ${e.message}", e as Exception)
+                    stopCentralTransport()
                 }.onSuccess {
                     sessionFlow.value.cryptoContext.serviceUuid?.let { uuid ->
                         safeTransitionTo(VerifierSessionState.Connecting)
