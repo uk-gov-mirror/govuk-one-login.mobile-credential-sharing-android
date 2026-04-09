@@ -6,6 +6,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
+import uk.gov.onelogin.sharing.core.presentation.bluetooth.BtConnectionErrorRoute.Companion.configureBluetoothConnectionErrorRoute
+import uk.gov.onelogin.sharing.holder.HolderNavigationExtensions.navigateToBluetoothConnectionErrorRoute
 import uk.gov.onelogin.sharing.holder.consent.HolderConsentNavigationExt.configureHolderConsentScreen
 import uk.gov.onelogin.sharing.holder.error.UnrecoverableHolderErrorNavigationExt.configureUnrecoverableHolderError
 import uk.gov.onelogin.sharing.holder.prerequisites.HolderPrerequisitesNavigationExt.configureHolderPrerequisitesScreen
@@ -21,9 +23,14 @@ data object HolderRoutes {
     fun NavGraphBuilder.configureHolderRoutes(controller: NavController) {
         navigation<HolderRoutes>(startDestination = HolderPrerequisitesRoute) {
             configureHolderPrerequisitesScreen(controller)
-            configureUnrecoverableHolderError(controller)
-            configureHolderPresentQrScreen(controller)
+            configureHolderPresentQrScreen(
+                controller = controller,
+                onError = {
+                    controller.navigateToBluetoothConnectionErrorRoute(it)
+                }
+            )
             configureHolderConsentScreen()
+            configureBluetoothConnectionErrorRoute(controller)
         }
     }
 }
