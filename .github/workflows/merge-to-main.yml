@@ -88,6 +88,8 @@ jobs:
 
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        env:
+          GITHUB_DEPENDENCY_GRAPH_JOB_CORRELATOR: automatic_dependency_submission-submit-gradle
 
       - name: Generate Changelog
         if: ${{ steps.versioning.outputs.current_version != steps.versioning.outputs.new_version }}
