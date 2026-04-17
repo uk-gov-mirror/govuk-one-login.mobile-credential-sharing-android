@@ -34,7 +34,8 @@ configurations.configureEach {
             "org.apache.commons" -> if (requested.name == "commons-lang3") {
                 useVersion(libs.versions.commons.lang3.get())
             }
-            "org.apache.httpcomponents" -> if (requested.name == "httpclient") {
+            "org.bouncycastle" -> useVersion(libs.versions.bouncycastle.get())
+                "org.apache.httpcomponents" -> if (requested.name == "httpclient") {
                 useVersion(libs.versions.httpclient.get())
             }
         }
