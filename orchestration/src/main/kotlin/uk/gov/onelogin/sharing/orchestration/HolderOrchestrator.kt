@@ -24,11 +24,13 @@ import uk.gov.onelogin.sharing.core.di.ApplicationScope
 import uk.gov.onelogin.sharing.core.implementation.ImplementationDetail
 import uk.gov.onelogin.sharing.core.implementation.RequiresImplementation
 import uk.gov.onelogin.sharing.core.logger.logTag
+import uk.gov.onelogin.sharing.cryptoService.cbor.decoders.DeviceRequestDecodingException
 import uk.gov.onelogin.sharing.cryptoService.cryptography.usecases.DecryptDeviceRequestUseCase
 import uk.gov.onelogin.sharing.cryptoService.holder.HolderCryptoService
 import uk.gov.onelogin.sharing.models.mdoc.sessionData.SessionDataStatus
 import uk.gov.onelogin.sharing.models.mdoc.sessionEstablishment.deviceResponse.DeviceResponse
 import uk.gov.onelogin.sharing.models.mdoc.sessionEstablishment.deviceResponse.Document
+import uk.gov.onelogin.sharing.models.mdoc.sessionEstablishment.deviceResponse.Status
 import uk.gov.onelogin.sharing.orchestration.Orchestrator.LogMessages.CANNOT_TRANSITION_TO_STATE
 import uk.gov.onelogin.sharing.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_ERROR
 import uk.gov.onelogin.sharing.orchestration.Orchestrator.LogMessages.START_ORCHESTRATION_SUCCESS
@@ -303,6 +305,8 @@ class HolderOrchestrator(
             }
 
             safeTransitionTo(HolderSessionState.AwaitingUserConsent(deviceRequest))
+        } catch (e: DeviceRequestDecodingException) {
+            handleDeviceRequestFailure(e)
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             sendTerminationAndFail(e)
         }
@@ -317,26 +321,55 @@ class HolderOrchestrator(
         val skDevice = context.skDevice
             ?: error("Missing skDevice")
 
-        val encryptedResponse = holderCryptoService.encryptDeviceResponse(
-            deviceResponse = deviceResponse,
+        return try {
+            val encryptedResponse = holderCryptoService.encryptDeviceResponse(
+                deviceResponse = deviceResponse,
+                skDevice = skDevice,
+                encryptCounter = context.encryptCounter
+            )
+
+            sessionFlow.value.updateSessionContext {
+                it.copy(encryptCounter = it.encryptCounter + 1u)
+            }
+
+            encryptedResponse
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            sendTerminationAndFail(e)
+            throw e
+        }
+    }
+
+    private fun handleDeviceRequestFailure(exception: DeviceRequestDecodingException) {
+        logger.error(logTag, exception.message ?: UNKNOWN_ERROR, exception)
+        val context = sessionFlow.value.sessionContext
+        val skDevice = checkNotNull(context.skDevice) {
+            "skDevice must be derived before handling DeviceRequest failure"
+        }
+
+        holderCryptoService.buildErrorSessionData(
+            deviceResponseStatus = Status.CBOR_DECODING_ERROR,
+            sessionDataStatus = SessionDataStatus.SESSION_TERMINATION,
             skDevice = skDevice,
             encryptCounter = context.encryptCounter
         )
 
-        sessionFlow.value.updateSessionContext {
-            it.copy(encryptCounter = it.encryptCounter + 1u)
-        }
-
-        return encryptedResponse
+        safeTransitionTo(
+            HolderSessionState.Complete.Failed(
+                SessionError(
+                    message = exception.message ?: UNKNOWN_ERROR,
+                    exception = exception
+                )
+            )
+        )
     }
 
     private fun sendTerminationAndFail(exception: Exception) {
-        logger.error(logTag, exception.message ?: "Unknown error", exception)
+        logger.error(logTag, exception.message ?: UNKNOWN_ERROR, exception)
         holderCryptoService.buildTerminationSessionData(SessionDataStatus.SESSION_TERMINATION)
         safeTransitionTo(
             HolderSessionState.Complete.Failed(
                 SessionError(
-                    message = exception.message ?: "Unknown error",
+                    message = exception.message ?: UNKNOWN_ERROR,
                     exception = exception
                 )
             )
@@ -374,5 +407,9 @@ class HolderOrchestrator(
             val loggedException = exceptionWrapper?.invoke(logMessage, exception) ?: exception
             logger.error(logTag, logMessage, loggedException)
         }
+    }
+
+    private companion object {
+        const val UNKNOWN_ERROR = "Unknown error"
     }
 }
