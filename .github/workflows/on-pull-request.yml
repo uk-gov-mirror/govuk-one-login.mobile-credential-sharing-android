@@ -84,6 +84,11 @@ jobs:
       - name: Run unit tests
         run: |
           ./scripts/test/unit
+      - name: Generate dependency graph report
+        uses: gradle/actions/dependency-submission@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        with:
+          dependency-graph: generate-and-upload
+          artifact-retention-days: 1
       - name: Upload unit test coverage report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
