@@ -46,7 +46,7 @@ import uk.gov.onelogin.sharing.orchestration.holder.session.matchers.HolderSessi
 import uk.gov.onelogin.sharing.orchestration.holder.session.matchers.HolderSessionStateMatchers.isFailed
 import uk.gov.onelogin.sharing.orchestration.holder.session.matchers.HolderSessionStateMatchers.isNotStarted
 import uk.gov.onelogin.sharing.orchestration.holder.session.matchers.HolderSessionStateMatchers.isProcessingEstablishment
-import uk.gov.onelogin.sharing.orchestration.prerequisites.MissingPrerequisiteV2
+import uk.gov.onelogin.sharing.orchestration.prerequisites.MissingPrerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.Prerequisite
 import uk.gov.onelogin.sharing.orchestration.prerequisites.StubPrerequisiteGate
 import uk.gov.onelogin.sharing.orchestration.prerequisites.state.BluetoothState
@@ -75,7 +75,7 @@ class HolderOrchestratorTest {
         HolderSessionState.NotStarted
     )
 
-    private var prerequisiteResponses: MutableList<MissingPrerequisiteV2> = mutableListOf()
+    private var prerequisiteResponses: MutableList<MissingPrerequisite> = mutableListOf()
 
     private val gate by lazy {
         StubPrerequisiteGate(prerequisiteResponses)
@@ -139,7 +139,7 @@ class HolderOrchestratorTest {
     @Test
     fun `Starting without meeting prerequisites then navigates to Preflight state`() = runTest {
         prerequisiteResponses.add(
-            MissingPrerequisiteV2.Bluetooth(BluetoothState.PoweredOff)
+            MissingPrerequisite.Bluetooth(BluetoothState.PoweredOff)
         )
         val sessionFactory = createSessionFactory()
         val orchestrator = createOrchestrator(sessionFactory = sessionFactory)
@@ -160,7 +160,7 @@ class HolderOrchestratorTest {
     @Test
     fun `Incapable prerequisite check responses transition to failed`() = runTest {
         prerequisiteResponses.add(
-            MissingPrerequisiteV2.Bluetooth(BluetoothState.Unsupported)
+            MissingPrerequisite.Bluetooth(BluetoothState.Unsupported)
         )
         val sessionFactory = createSessionFactory()
         val orchestrator = createOrchestrator(sessionFactory = sessionFactory)
