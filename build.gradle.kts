@@ -31,26 +31,32 @@ buildscript {
 
 allprojects {
     configurations.configureEach {
-        resolutionStrategy.eachDependency {
-            when (requested.group) {
-                "io.netty" -> useVersion(libs.versions.netty.get())
-                "ch.qos.logback" -> useVersion(libs.versions.logback.get())
-                "org.jdom" -> useVersion(libs.versions.jdom2.get())
-                "org.bitbucket.b_c" -> useVersion(libs.versions.jose4j.get())
-                "com.google.guava" -> if (requested.name == "guava") {
-                    useVersion(libs.versions.guava.get())
-                }
-                "com.google.android.gms" -> if (requested.name == "play-services-basement") {
-                    useVersion(libs.versions.play.services.basement.get())
-                }
-                "org.apache.commons" -> if (requested.name == "commons-lang3") {
-                    useVersion(libs.versions.commons.lang3.get())
-                }
-                "org.bouncycastle" -> useVersion(libs.versions.bouncycastle.get())
-                "org.apache.httpcomponents" -> if (requested.name == "httpclient") {
-                    useVersion(libs.versions.httpclient.get())
-                }
-            }
+        resolutionStrategy {
+            force(
+                "io.netty:netty-codec-http2:${libs.versions.netty.get()}",
+                "io.netty:netty-codec-http:${libs.versions.netty.get()}",
+                "io.netty:netty-codec:${libs.versions.netty.get()}",
+                "io.netty:netty-codec-socks:${libs.versions.netty.get()}",
+                "io.netty:netty-common:${libs.versions.netty.get()}",
+                "io.netty:netty-buffer:${libs.versions.netty.get()}",
+                "io.netty:netty-transport:${libs.versions.netty.get()}",
+                "io.netty:netty-resolver:${libs.versions.netty.get()}",
+                "io.netty:netty-handler:${libs.versions.netty.get()}",
+                "io.netty:netty-handler-proxy:${libs.versions.netty.get()}",
+                "io.netty:netty-transport-native-unix-common:${libs.versions.netty.get()}",
+                "ch.qos.logback:logback-core:${libs.versions.logback.get()}",
+                "ch.qos.logback:logback-classic:${libs.versions.logback.get()}",
+                "org.jdom:jdom2:${libs.versions.jdom2.get()}",
+                "org.bitbucket.b_c:jose4j:${libs.versions.jose4j.get()}",
+                "com.google.guava:guava:${libs.versions.guava.get()}",
+                "com.google.android.gms:play-services-basement:${libs.versions.play.services.basement.get()}",
+                "org.apache.commons:commons-lang3:${libs.versions.commons.lang3.get()}",
+                "org.apache.httpcomponents:httpclient:${libs.versions.httpclient.get()}",
+                "org.bouncycastle:bcpkix-jdk18on:${libs.versions.bouncycastle.get()}",
+                "org.bouncycastle:bcprov-jdk18on:${libs.versions.bouncycastle.get()}",
+                "org.bouncycastle:bcutil-jdk18on:${libs.versions.bouncycastle.get()}",
+                "org.bouncycastle:bcpg-jdk18on:${libs.versions.bouncycastle.get()}",
+            )
         }
     }
 }
