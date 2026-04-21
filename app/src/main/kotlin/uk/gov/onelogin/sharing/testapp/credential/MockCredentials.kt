@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.testapp.credential.select
+package uk.gov.onelogin.sharing.testapp.credential
 
 import android.content.Context
 import java.util.Base64

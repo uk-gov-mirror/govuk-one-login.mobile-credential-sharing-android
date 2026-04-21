@@ -1,7 +1,7 @@
 package uk.gov.onelogin.sharing.testapp
 
 import java.security.KeyPairGenerator
-import uk.gov.onelogin.sharing.testapp.credential.provider.ALGORITHM_EC
+import uk.gov.onelogin.sharing.testapp.credential.ALGORITHM_EC
 
 object SampleCredentialProviderStub {
 

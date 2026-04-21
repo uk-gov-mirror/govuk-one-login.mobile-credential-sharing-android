@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uk.gov.onelogin.sharing.testapp.CREDENTIAL_ITEM_TAG
 import uk.gov.onelogin.sharing.testapp.R
+import uk.gov.onelogin.sharing.testapp.credential.MockCredential
 
 @Composable
 internal fun SelectCredentialsScreen(

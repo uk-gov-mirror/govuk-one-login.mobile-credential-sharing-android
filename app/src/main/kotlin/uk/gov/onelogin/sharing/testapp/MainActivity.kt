@@ -18,13 +18,13 @@ import uk.gov.onelogin.sharing.sdk.api.presenter.PresentCredentialSdk
 import uk.gov.onelogin.sharing.sdk.api.verifier.VerifyCredentialSdk
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureHolderJourneyWrapper
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureTestAppHomeScreen
-import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureVerifierAttributesSelection
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureVerifierJourneyWrapper
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToTestAppHolderJourney
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToTestAppVerifierJourney
-import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToVerifierAttributesSelection
-import uk.gov.onelogin.sharing.testapp.credential.provider.SampleCredentialProvider
-import uk.gov.onelogin.sharing.testapp.credential.select.MockCredentials
+import uk.gov.onelogin.sharing.testapp.credential.MockCredentials
+import uk.gov.onelogin.sharing.testapp.credential.SampleCredentialProvider
+import uk.gov.onelogin.sharing.testapp.credential.attribute.select.SelectCredentialAttributesNavigationExt.configureVerifierAttributesSelection
+import uk.gov.onelogin.sharing.testapp.credential.attribute.select.SelectCredentialAttributesNavigationExt.navigateToVerifierAttributesSelection
 import uk.gov.onelogin.sharing.testapp.credential.select.SelectCredentialNavigationExt.configureSelectMockCredentialDialog
 import uk.gov.onelogin.sharing.testapp.credential.select.SelectCredentialNavigationExt.navigateToHolderCredentialSelection
 

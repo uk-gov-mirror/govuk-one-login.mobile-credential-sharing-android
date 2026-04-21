@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.dialog
+import uk.gov.onelogin.sharing.testapp.credential.MockCredential
 
 object SelectCredentialNavigationExt {
     fun NavController.navigateToHolderCredentialSelection(

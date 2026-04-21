@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.testapp.credential.select
+package uk.gov.onelogin.sharing.testapp.credential
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

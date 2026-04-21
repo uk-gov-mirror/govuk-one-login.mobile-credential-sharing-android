@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.testapp.credential.provider
+package uk.gov.onelogin.sharing.testapp.credential
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -12,8 +12,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import uk.gov.onelogin.sharing.orchestration.CredentialRequest
 import uk.gov.onelogin.sharing.testapp.SampleCredentialProviderStub
-import uk.gov.onelogin.sharing.testapp.credential.select.MockCredential
-import uk.gov.onelogin.sharing.testapp.credential.select.MockCredentials
 
 @RunWith(RobolectricTestRunner::class)
 class SampleCredentialProviderTest {

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerificationRequest
-import uk.gov.onelogin.sharing.testapp.credential.select.MockCredential
+import uk.gov.onelogin.sharing.testapp.credential.MockCredential
 
 @Parcelize
 @Serializable
@@ -21,7 +21,4 @@ sealed interface CredentialSharingDestination : Parcelable {
     @Serializable
     data class Verifier(val request: VerificationRequest) : CredentialSharingDestination
 
-    @Parcelize
-    @Serializable
-    data object SelectAttributes : CredentialSharingDestination
 }

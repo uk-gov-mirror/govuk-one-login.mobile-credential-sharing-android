@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.testapp.credential.select
+package uk.gov.onelogin.sharing.testapp.credential
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -60,11 +60,11 @@ data class MockCredential(
                 bundle.putString(key, serializeAsValue(value))
             }
 
-            override fun parseValue(value: String): MockCredential = Json.decodeFromString(value)
+            override fun parseValue(value: String): MockCredential = Json.Default.decodeFromString(value)
 
             override fun serializeAsValue(
                 value: MockCredential
-            ): String = Json.encodeToString(value)
+            ): String = Json.Default.encodeToString(value)
         }
     }
 }
