@@ -1,8 +1,9 @@
-package uk.gov.onelogin.sharing.testapp
+package uk.gov.onelogin.sharing.testapp.credential.select
 
 import android.content.Context
 import java.util.Base64
 import java.util.UUID
+import uk.gov.onelogin.sharing.testapp.R
 
 object MockCredentials {
 

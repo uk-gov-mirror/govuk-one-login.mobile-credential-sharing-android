@@ -17,14 +17,16 @@ import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerifierConfig
 import uk.gov.onelogin.sharing.sdk.api.presenter.PresentCredentialSdk
 import uk.gov.onelogin.sharing.sdk.api.verifier.VerifyCredentialSdk
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureHolderJourneyWrapper
-import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureSelectMockCredential
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureTestAppHomeScreen
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureVerifierAttributesSelection
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureVerifierJourneyWrapper
-import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToHolderCredentialSelection
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToTestAppHolderJourney
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToTestAppVerifierJourney
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToVerifierAttributesSelection
+import uk.gov.onelogin.sharing.testapp.credential.provider.SampleCredentialProvider
+import uk.gov.onelogin.sharing.testapp.credential.select.MockCredentials
+import uk.gov.onelogin.sharing.testapp.credential.select.SelectCredentialNavigationExt.configureSelectMockCredentialDialog
+import uk.gov.onelogin.sharing.testapp.credential.select.SelectCredentialNavigationExt.navigateToHolderCredentialSelection
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -64,7 +66,7 @@ class MainActivity : ComponentActivity() {
                             navController.navigateToVerifierAttributesSelection()
                         }
                     )
-                    configureSelectMockCredential(
+                    configureSelectMockCredentialDialog(
                         mockCredentials = mockCredentials
                     ) { selectedCredential ->
                         navController.navigateToTestAppHolderJourney(selectedCredential) {
@@ -75,8 +77,10 @@ class MainActivity : ComponentActivity() {
                     }
                     configureHolderJourneyWrapper(navController) { credential ->
                         presentCredentialSdk
-                            .presenter(SampleCredentialProvider(
-                                credential)
+                            .presenter(
+                                SampleCredentialProvider(
+                                    credential
+                                )
                             )
                     }
                     configureVerifierAttributesSelection { attributeGroup ->

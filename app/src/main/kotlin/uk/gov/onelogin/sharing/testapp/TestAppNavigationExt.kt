@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -42,7 +40,8 @@ import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerificationReq
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerificationRequest.Companion.VerificationRequestType
 import uk.gov.onelogin.sharing.sdk.api.presenter.CredentialPresenter
 import uk.gov.onelogin.sharing.sdk.api.verifier.CredentialVerifier
-import uk.gov.onelogin.sharing.testapp.MockCredential.Companion.MockCredentialType
+import uk.gov.onelogin.sharing.testapp.credential.select.MockCredential
+import uk.gov.onelogin.sharing.testapp.credential.select.MockCredential.Companion.MockCredentialType
 import uk.gov.onelogin.sharing.ui.impl.ShareCredential
 import uk.gov.onelogin.sharing.ui.impl.VerifyCredential
 
@@ -130,47 +129,6 @@ object TestAppNavigationExt {
                         ),
                         contentDescription = "Close"
                     )
-                }
-            }
-        }
-    }
-
-    fun NavController.navigateToHolderCredentialSelection(
-        options: NavOptionsBuilder.() -> Unit = {}
-    ) = navigate(
-        CredentialSharingDestination.SelectCredential,
-        options
-    )
-
-    internal fun NavGraphBuilder.configureSelectMockCredential(
-        mockCredentials: List<MockCredential>,
-        onSelectCredential: (MockCredential) -> Unit = {}
-    ) {
-        dialog<CredentialSharingDestination.SelectCredential> {
-            Surface(
-                shape = RoundedCornerShape(24.dp),
-                border = BorderStroke(1.dp, Color.Gray)
-            ) {
-                Column(modifier = Modifier.padding(24.dp)) {
-                    Text(
-                        text = stringResource(R.string.select_credential),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    LazyColumn {
-                        items(mockCredentials, key = { it.id }) { credential ->
-                            OutlinedButton(
-                                onClick = { onSelectCredential(credential) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                                    .testTag(CREDENTIAL_ITEM_TAG)
-                            ) {
-                                Text(credential.displayName)
-                            }
-                        }
-                    }
                 }
             }
         }

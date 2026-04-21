@@ -18,6 +18,7 @@ import uk.gov.onelogin.sharing.sdk.FakeCredentialVerifier
 import uk.gov.onelogin.sharing.sdk.api.presenter.PresentCredentialGraph
 import uk.gov.onelogin.sharing.sdk.api.shared.CredentialSharingAppGraph
 import uk.gov.onelogin.sharing.sdk.api.verifier.VerifyCredentialGraph
+import uk.gov.onelogin.sharing.testapp.credential.select.MockCredential
 
 class MainActivityRule(
     composeTestRule: ComposeContentTestRule,

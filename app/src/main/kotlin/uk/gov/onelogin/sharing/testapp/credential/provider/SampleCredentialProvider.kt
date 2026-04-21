@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.testapp
+package uk.gov.onelogin.sharing.testapp.credential.provider
 
 import java.security.KeyFactory
 import java.security.Signature
@@ -6,6 +6,7 @@ import java.security.spec.PKCS8EncodedKeySpec
 import uk.gov.onelogin.sharing.orchestration.Credential
 import uk.gov.onelogin.sharing.orchestration.CredentialProvider
 import uk.gov.onelogin.sharing.orchestration.CredentialRequest
+import uk.gov.onelogin.sharing.testapp.credential.select.MockCredential
 
 const val ALGORITHM_EC = "EC"
 const val SIGNING_ALGORITHM = "SHA256withECDSA"

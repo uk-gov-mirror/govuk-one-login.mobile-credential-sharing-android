@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.testapp
+package uk.gov.onelogin.sharing.testapp.credential.select
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -27,8 +27,30 @@ data class MockCredential(
 
     override fun toString(): String = "MockCredential(id=$id, displayName=$displayName)"
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MockCredential
+
+        if (id != other.id) return false
+        if (displayName != other.displayName) return false
+        if (!rawCredential.contentEquals(other.rawCredential)) return false
+        if (!privateKey.contentEquals(other.privateKey)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + displayName.hashCode()
+        result = 31 * result + rawCredential.contentHashCode()
+        result = 31 * result + privateKey.contentHashCode()
+        return result
+    }
+
     companion object {
-        internal val MockCredentialType = object : NavType<MockCredential>(
+        val MockCredentialType: NavType<MockCredential> = object : NavType<MockCredential>(
             isNullableAllowed = false
         ) {
             override fun get(bundle: Bundle, key: String): MockCredential? =
@@ -40,7 +62,9 @@ data class MockCredential(
 
             override fun parseValue(value: String): MockCredential = Json.decodeFromString(value)
 
-            override fun serializeAsValue(value: MockCredential): String = Json.encodeToString(value)
+            override fun serializeAsValue(
+                value: MockCredential
+            ): String = Json.encodeToString(value)
         }
     }
 }

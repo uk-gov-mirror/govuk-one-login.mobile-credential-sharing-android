@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.testapp
+package uk.gov.onelogin.sharing.testapp.credential.select
 
 import android.content.Context
 import android.content.res.AssetManager
@@ -7,10 +7,11 @@ import io.mockk.every
 import io.mockk.mockk
 import java.io.ByteArrayInputStream
 import java.util.UUID
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import org.junit.Assert.assertArrayEquals
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
-import org.junit.Test
+import uk.gov.onelogin.sharing.testapp.R
 
 class MockCredentialsTest {
     private val base64EncodedCredential = "AQID"
@@ -23,11 +24,11 @@ class MockCredentialsTest {
     private val context: Context = mockk {
         every { resources } returns mockk<Resources> {
             every { openRawResource(R.raw.mock_credential) } returns
-                ByteArrayInputStream(base64EncodedCredential.toByteArray())
+                    ByteArrayInputStream(base64EncodedCredential.toByteArray())
         }
         every { assets } returns mockk<AssetManager> {
             every { open("test_private_key.pem") } returns
-                ByteArrayInputStream(privateKeyContent.toByteArray())
+                    ByteArrayInputStream(privateKeyContent.toByteArray())
         }
     }
 

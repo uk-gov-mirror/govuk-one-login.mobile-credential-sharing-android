@@ -1,18 +1,19 @@
-package uk.gov.onelogin.sharing.testapp
+package uk.gov.onelogin.sharing.testapp.credential.provider
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import java.security.Signature
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertArrayEquals
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import uk.gov.onelogin.sharing.orchestration.CredentialRequest
-import uk.gov.onelogin.sharing.testapp.SampleCredentialProviderStub.DEVICE_AUTHENTICATION_HEX
-import uk.gov.onelogin.sharing.testapp.SampleCredentialProviderStub.keyPair
+import uk.gov.onelogin.sharing.testapp.SampleCredentialProviderStub
+import uk.gov.onelogin.sharing.testapp.credential.select.MockCredential
+import uk.gov.onelogin.sharing.testapp.credential.select.MockCredentials
 
 @RunWith(RobolectricTestRunner::class)
 class SampleCredentialProviderTest {
@@ -24,7 +25,7 @@ class SampleCredentialProviderTest {
             id = realCredential.id,
             displayName = realCredential.displayName,
             rawCredential = realCredential.rawCredential,
-            privateKey = keyPair.private.encoded
+            privateKey = SampleCredentialProviderStub.keyPair.private.encoded
         )
 
         SampleCredentialProvider(stubCredential)
@@ -49,7 +50,7 @@ class SampleCredentialProviderTest {
     @Test
     fun `sign returns a valid SHA256withECDSA signature for DeviceAuthentication bytes`() =
         runTest {
-            val deviceAuthenticationBytes = DEVICE_AUTHENTICATION_HEX
+            val deviceAuthenticationBytes = SampleCredentialProviderStub.DEVICE_AUTHENTICATION_HEX
                 .chunked(2)
                 .map { it.toInt(16).toByte() }
                 .toByteArray()
@@ -60,7 +61,7 @@ class SampleCredentialProviderTest {
             )
 
             val isValid = Signature.getInstance(SIGNING_ALGORITHM).run {
-                initVerify(keyPair.public)
+                initVerify(SampleCredentialProviderStub.keyPair.public)
                 update(deviceAuthenticationBytes)
                 verify(signature)
             }
