@@ -5,6 +5,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,10 +22,8 @@ import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerificationReq
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerifierConfig
 import uk.gov.onelogin.sharing.sdk.api.presenter.PresentCredentialSdk
 import uk.gov.onelogin.sharing.sdk.api.verifier.VerifyCredentialSdk
-import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureHolderJourneyWrapper
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureTestAppHomeScreen
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.configureVerifierJourneyWrapper
-import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToTestAppHolderJourney
 import uk.gov.onelogin.sharing.testapp.TestAppNavigationExt.navigateToTestAppVerifierJourney
 import uk.gov.onelogin.sharing.testapp.credential.MockCredentials
 import uk.gov.onelogin.sharing.testapp.credential.SampleCredentialProvider
@@ -27,6 +31,8 @@ import uk.gov.onelogin.sharing.testapp.credential.attribute.select.SelectCredent
 import uk.gov.onelogin.sharing.testapp.credential.attribute.select.SelectCredentialAttributesNavigationExt.navigateToVerifierAttributesSelection
 import uk.gov.onelogin.sharing.testapp.credential.select.SelectCredentialNavigationExt.configureSelectMockCredentialDialog
 import uk.gov.onelogin.sharing.testapp.credential.select.SelectCredentialNavigationExt.navigateToHolderCredentialSelection
+import uk.gov.onelogin.sharing.testapp.holder.HolderTestAppJourneyNavigationExt.configureHolderJourneyWrapper
+import uk.gov.onelogin.sharing.testapp.holder.HolderTestAppJourneyNavigationExt.navigateToTestAppHolderJourney
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -54,54 +60,60 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             GdsTheme {
-                NavHost(
-                    navController = navController,
-                    startDestination = CredentialSharingDestination.Undetermined,
+                Column(modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .fillMaxSize()
                 ) {
-                    configureTestAppHomeScreen(
-                        onStartHolderJourney = {
-                            navController.navigateToHolderCredentialSelection()
-                        },
-                        onStartVerifierJourney = {
-                            navController.navigateToVerifierAttributesSelection()
-                        }
-                    )
-                    configureSelectMockCredentialDialog(
-                        mockCredentials = mockCredentials
-                    ) { selectedCredential ->
-                        navController.navigateToTestAppHolderJourney(selectedCredential) {
-                            popUpTo<CredentialSharingDestination.Undetermined> {
-                                inclusive = false
+                    NavHost(
+                        navController = navController,
+                        startDestination = CredentialSharingDestination.Undetermined,
+                        modifier = Modifier.safeContentPadding()
+                    ) {
+                        configureTestAppHomeScreen(
+                            onStartHolderJourney = {
+                                navController.navigateToHolderCredentialSelection()
+                            },
+                            onStartVerifierJourney = {
+                                navController.navigateToVerifierAttributesSelection()
+                            }
+                        )
+                        configureSelectMockCredentialDialog(
+                            mockCredentials = mockCredentials
+                        ) { selectedCredential ->
+                            navController.navigateToTestAppHolderJourney(selectedCredential) {
+                                popUpTo<CredentialSharingDestination.Undetermined> {
+                                    inclusive = false
+                                }
                             }
                         }
-                    }
-                    configureHolderJourneyWrapper(navController) { credential ->
-                        presentCredentialSdk
-                            .presenter(
-                                SampleCredentialProvider(
-                                    credential
+                        configureHolderJourneyWrapper(navController) { credential ->
+                            presentCredentialSdk
+                                .presenter(
+                                    SampleCredentialProvider(
+                                        credential
+                                    )
+                                )
+                        }
+                        configureVerifierAttributesSelection { attributeGroup ->
+                            navController.navigateToTestAppVerifierJourney(
+                                VerificationRequest.typed(
+                                    DocumentType.Mdl,
+                                    attributeGroup = attributeGroup
+                                )
+                            ) {
+                                popUpTo<CredentialSharingDestination.Undetermined> {
+                                    inclusive = false
+                                }
+                            }
+                        }
+                        configureVerifierJourneyWrapper(navController) { verificationRequest ->
+                            verifyCredentialSdk.verifier(
+                                VerifierConfig(
+                                    verificationRequest = verificationRequest,
+                                    trustedCertificates = emptyList()
                                 )
                             )
-                    }
-                    configureVerifierAttributesSelection { attributeGroup ->
-                        navController.navigateToTestAppVerifierJourney(
-                            VerificationRequest.typed(
-                                DocumentType.Mdl,
-                                attributeGroup = attributeGroup
-                            )
-                        ) {
-                            popUpTo<CredentialSharingDestination.Undetermined> {
-                                inclusive = false
-                            }
                         }
-                    }
-                    configureVerifierJourneyWrapper(navController) { verificationRequest ->
-                        verifyCredentialSdk.verifier(
-                            VerifierConfig(
-                                verificationRequest = verificationRequest,
-                                trustedCertificates = emptyList()
-                            )
-                        )
                     }
                 }
             }

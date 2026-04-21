@@ -16,58 +16,10 @@ import androidx.navigation.toRoute
 import kotlin.reflect.typeOf
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerificationRequest
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerificationRequest.Companion.VerificationRequestType
-import uk.gov.onelogin.sharing.sdk.api.presenter.CredentialPresenter
 import uk.gov.onelogin.sharing.sdk.api.verifier.CredentialVerifier
-import uk.gov.onelogin.sharing.testapp.credential.MockCredential
-import uk.gov.onelogin.sharing.testapp.credential.MockCredential.Companion.MockCredentialType
-import uk.gov.onelogin.sharing.ui.impl.ShareCredential
 import uk.gov.onelogin.sharing.ui.impl.VerifyCredential
 
 object TestAppNavigationExt {
-    fun NavController.navigateToTestAppHolderJourney(
-        credential: MockCredential,
-        options: NavOptionsBuilder.() -> Unit = {}
-    ) = navigate(
-        CredentialSharingDestination.Holder(credential = credential),
-        options
-    )
-
-    internal fun NavGraphBuilder.configureHolderJourneyWrapper(
-        navController: NavController,
-        component: (MockCredential) -> CredentialPresenter
-    ) {
-        composable<CredentialSharingDestination.Holder>(
-            typeMap = mapOf(
-                typeOf<MockCredential>() to MockCredentialType
-            )
-        ) { navBackStackEntry ->
-            val arguments: CredentialSharingDestination.Holder = navBackStackEntry.toRoute()
-            val presenter = remember { component(arguments.credential) }
-
-            ShareCredential(
-                component = presenter,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            Box {
-                IconButton(
-                    modifier = Modifier.align(Alignment.TopStart),
-                    onClick = {
-                        presenter.orchestrator.cancel()
-                        navController.popBackStack()
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            android.R.drawable.ic_menu_close_clear_cancel
-                        ),
-                        contentDescription = "Close"
-                    )
-                }
-            }
-        }
-    }
-
     fun NavController.navigateToTestAppVerifierJourney(
         request: VerificationRequest,
         options: NavOptionsBuilder.() -> Unit = {}

@@ -26,7 +26,6 @@ import uk.gov.onelogin.sharing.orchestration.verificationrequest.AttributeGroup
 import uk.gov.onelogin.sharing.testapp.ATTRIBUTE_GROUP_ITEM_TAG
 import uk.gov.onelogin.sharing.testapp.R
 import uk.gov.onelogin.sharing.testapp.VERIFY_CREDENTIAL_BUTTON_TAG
-import uk.gov.onelogin.sharing.testapp.VerifierAttributeOption
 
 @Composable
 internal fun SelectCredentialAttributesScreen(
