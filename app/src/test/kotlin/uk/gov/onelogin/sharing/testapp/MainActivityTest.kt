@@ -19,6 +19,7 @@ import uk.gov.onelogin.sharing.sdk.api.presenter.PresentCredentialGraph
 import uk.gov.onelogin.sharing.sdk.api.shared.CredentialSharingAppGraph
 import uk.gov.onelogin.sharing.sdk.api.verifier.VerifyCredentialGraph
 import uk.gov.onelogin.sharing.testapp.credential.MockCredential
+import uk.gov.onelogin.sharing.testapp.home.TestAppScreen
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {

@@ -1,4 +1,4 @@
-package uk.gov.onelogin.sharing.testapp
+package uk.gov.onelogin.sharing.testapp.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import uk.gov.onelogin.sharing.testapp.R
 
 @Composable
 fun TestAppScreen(
