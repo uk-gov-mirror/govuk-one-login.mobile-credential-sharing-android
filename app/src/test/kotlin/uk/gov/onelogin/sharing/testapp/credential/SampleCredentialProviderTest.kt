@@ -12,12 +12,13 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import uk.gov.onelogin.sharing.orchestration.CredentialRequest
 import uk.gov.onelogin.sharing.testapp.SampleCredentialProviderStub
+import uk.gov.onelogin.sharing.testapp.credential.MockCredentialData.mockCredential
 
 @RunWith(RobolectricTestRunner::class)
 class SampleCredentialProviderTest {
     private val context: Context by lazy { ApplicationProvider.getApplicationContext() }
     private val credentialProvider by lazy {
-        val realCredential = MockCredentials.mockCredential(context)
+        val realCredential = mockCredential
 
         val stubCredential = MockCredential(
             id = realCredential.id,
@@ -41,8 +42,7 @@ class SampleCredentialProviderTest {
         val credentials =
             credentialProvider.getCredentials(CredentialRequest(documentTypes = emptyList()))
 
-        val realCredential = MockCredentials.mockCredential(context)
-        assertArrayEquals(realCredential.rawCredential, credentials.first().rawCredential)
+        assertArrayEquals(mockCredential.rawCredential, credentials.first().rawCredential)
     }
 
     @Test

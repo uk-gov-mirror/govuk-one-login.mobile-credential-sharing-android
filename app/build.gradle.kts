@@ -123,6 +123,7 @@ dependencies {
         platform(libs.androidx.compose.bom),
         libs.androidx.navigation.testing,
         libs.bundles.android.baseline,
+        testFixtures(libs.uk.gov.ui.android.componentsv2),
         testFixtures(projects.sdk),
         testFixtures(projects.ui.uiApi),
         testFixtures(projects.ui.uiImpl)
@@ -136,6 +137,6 @@ dependencies {
         testFixtures(projects.core), // Remove once SDK prerequisites screen handles permissions
         testFixtures(projects.holder),
         testFixtures(projects.orchestration),
-        testFixtures(projects.sdk)
+        testFixtures(projects.sdk),
     ).forEach(::testImplementation)
 }
