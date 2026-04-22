@@ -32,7 +32,10 @@ object HolderTestAppJourneyNavigationExt {
             val arguments: HolderTestAppJourney = navBackStackEntry.toRoute()
             val presenter = remember { component(arguments.credential) }
 
-            HolderTestAppJourneyScreen(presenter, navController)
+            HolderTestAppJourneyScreen(presenter) {
+                presenter.orchestrator.cancel()
+                navController.popBackStack()
+            }
         }
     }
 }
