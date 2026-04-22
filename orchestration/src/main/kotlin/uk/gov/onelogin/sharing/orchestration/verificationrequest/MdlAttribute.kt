@@ -117,7 +117,7 @@ sealed class MdlAttribute(open val value: String) : Parcelable {
 
     @Serializable
     @TypeParceler<MdlAttribute, MdlAttributeParceler>()
-    class Custom(val attributeName: String) : MdlAttribute(attributeName) {
+    data class Custom(val attributeName: String) : MdlAttribute(attributeName) {
         override fun validate(data: Any) = true
     }
 

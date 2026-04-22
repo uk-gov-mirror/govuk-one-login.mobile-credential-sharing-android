@@ -20,6 +20,15 @@ import uk.gov.onelogin.sharing.orchestration.verificationrequest.MdlAttribute.Re
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.MdlAttribute.ResidentPostalCode
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.MdlAttribute.UnDistinguishingSign
 
+/**
+ * [Parceler] implementation for converting between [MdlAttribute] and [Parcel].
+ *
+ * The implementation only considers the [MdlAttribute.value] property. This means that additional
+ * properties are ignored, such as:
+ *
+ * - [AgeOver.age]
+ * - [Custom.attributeName]
+ */
 object MdlAttributeParceler : Parceler<MdlAttribute> {
     override fun MdlAttribute.write(parcel: Parcel, flags: Int) {
         parcel.writeString(value)
