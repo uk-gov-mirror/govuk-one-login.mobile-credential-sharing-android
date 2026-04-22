@@ -12,8 +12,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import org.junit.Assert.assertArrayEquals
 import uk.gov.onelogin.sharing.testapp.R
+import uk.gov.onelogin.sharing.testapp.credential.MockCredentialData.mockCredentialState
 
-class MockCredentialsTest {
+class MockCredentialStateTest {
     private val base64EncodedCredential = "AQID"
 
     private val privateKeyContent = this::class.java.classLoader
@@ -24,46 +25,35 @@ class MockCredentialsTest {
     private val context: Context = mockk {
         every { resources } returns mockk<Resources> {
             every { openRawResource(R.raw.mock_credential) } returns
-                ByteArrayInputStream(base64EncodedCredential.toByteArray())
+                    ByteArrayInputStream(base64EncodedCredential.toByteArray())
         }
         every { assets } returns mockk<AssetManager> {
             every { open("test_private_key.pem") } returns
-                ByteArrayInputStream(privateKeyContent.toByteArray())
+                    ByteArrayInputStream(privateKeyContent.toByteArray())
         }
     }
 
     @Test
-    fun `mockCredential returns credential with displayName Jane Doe`() {
-        val credential = MockCredentials.mockCredential(context)
-        assertEquals("Jane Doe", credential.displayName)
+    fun `mockCredential equality contract`() {
+        assertEquals(mockCredentialState, mockCredentialState.copy())
+        assertNotEquals(mockCredentialState, mockCredentialState.copy(id = "Unit test"))
+        assertNotEquals(mockCredentialState, mockCredentialState.copy(displayName = "Unit test"))
+        assertNotEquals(
+            mockCredentialState,
+            mockCredentialState.copy(privateKeyAssetName = "Unit test")
+        )
+        assertNotEquals(mockCredentialState, mockCredentialState.copy(rawCredentialRes = -2))
     }
 
     @Test
     fun `mockCredential returns credential with decoded rawCredential`() {
-        val credential = MockCredentials.mockCredential(context)
+        val credential = mockCredentialState.toCredential(context)
         assertArrayEquals(byteArrayOf(1, 2, 3), credential.rawCredential)
     }
 
     @Test
     fun `mockCredential returns credential with a valid UUID id`() {
-        val credential = MockCredentials.mockCredential(context)
+        val credential = mockCredentialState.toCredential(context)
         assertEquals(UUID.fromString(credential.id).toString(), credential.id)
-    }
-
-    @Test
-    fun `mockCredential returns a unique id on each call`() {
-        every { context.resources.openRawResource(R.raw.mock_credential) } returnsMany listOf(
-            ByteArrayInputStream(base64EncodedCredential.toByteArray()),
-            ByteArrayInputStream(base64EncodedCredential.toByteArray())
-        )
-        every { context.assets.open("test_private_key.pem") } returnsMany listOf(
-            ByteArrayInputStream(privateKeyContent.toByteArray()),
-            ByteArrayInputStream(privateKeyContent.toByteArray())
-        )
-
-        val first = MockCredentials.mockCredential(context)
-        val second = MockCredentials.mockCredential(context)
-
-        assertNotEquals(first.id, second.id)
     }
 }

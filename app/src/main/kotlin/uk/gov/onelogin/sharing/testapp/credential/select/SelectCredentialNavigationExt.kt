@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.dialog
-import uk.gov.onelogin.sharing.testapp.credential.MockCredential
+import uk.gov.onelogin.sharing.testapp.credential.MockCredentialState
 
 object SelectCredentialNavigationExt {
     fun NavController.navigateToHolderCredentialSelection(
@@ -15,8 +15,8 @@ object SelectCredentialNavigationExt {
     )
 
     internal fun NavGraphBuilder.configureSelectMockCredentialDialog(
-        mockCredentials: List<MockCredential>,
-        onSelectCredential: (MockCredential) -> Unit = {}
+        mockCredentials: List<MockCredentialState>,
+        onSelectCredential: (MockCredentialState) -> Unit = {}
     ) {
         dialog<SelectCredentialRoute> {
             SelectCredentialsScreen(

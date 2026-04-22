@@ -7,7 +7,7 @@ import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.runner.RunWith
-import uk.gov.onelogin.sharing.testapp.credential.MockCredentialData.mockCredential
+import uk.gov.onelogin.sharing.testapp.credential.MockCredentialData.mockCredentialState
 
 @RunWith(AndroidJUnit4::class)
 class SelectCredentialsScreenTest {
@@ -15,14 +15,14 @@ class SelectCredentialsScreenTest {
     @get:Rule
     val composeTestRule = SelectCredentialsScreenRule(createComposeRule())
 
-    private val otherCredential = mockCredential.copy(
+    private val otherCredentialState = mockCredentialState.copy(
         id = UUID.randomUUID().toString(),
         displayName = "Unit test"
     )
 
     private val credentials = listOf(
-        mockCredential,
-        otherCredential
+        mockCredentialState,
+        otherCredentialState
     )
 
     @Test
@@ -31,14 +31,14 @@ class SelectCredentialsScreenTest {
             setContent {
                 SelectCredentialsScreen(
                     credentials = credentials,
-                    onSelectCredential = composeTestRule::updateMockCredential
+                    onSelectCredential = composeTestRule::updateMockCredentialState
                 )
             }
 
             assertSelectableCredentialCount(credentials.size)
 
-            performCredentialClick(mockCredential)
-            assertSelectedCredentialEquals(mockCredential)
+            performCredentialClick(mockCredentialState)
+            assertSelectedCredentialEquals(mockCredentialState)
         }
     }
 }

@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val mockCredentials = MockCredentials.getMockCredentials(this)
+        val mockCredentials = MockCredentials.getMockCredentialStates()
 
         if (BuildConfig.DEBUG) {
             Log.d(

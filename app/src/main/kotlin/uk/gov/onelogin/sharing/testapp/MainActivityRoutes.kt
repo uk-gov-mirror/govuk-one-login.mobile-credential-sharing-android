@@ -7,7 +7,7 @@ import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerificationReq
 import uk.gov.onelogin.sharing.orchestration.verificationrequest.VerifierConfig
 import uk.gov.onelogin.sharing.sdk.api.presenter.PresentCredentialSdk
 import uk.gov.onelogin.sharing.sdk.api.verifier.VerifyCredentialSdk
-import uk.gov.onelogin.sharing.testapp.credential.MockCredential
+import uk.gov.onelogin.sharing.testapp.credential.MockCredentialState
 import uk.gov.onelogin.sharing.testapp.credential.SampleCredentialProvider
 import uk.gov.onelogin.sharing.testapp.credential.attribute.select.SelectCredentialAttributesNavigationExt.configureVerifierAttributesSelection
 import uk.gov.onelogin.sharing.testapp.credential.attribute.select.SelectCredentialAttributesNavigationExt.navigateToVerifierAttributesSelection
@@ -22,7 +22,7 @@ import uk.gov.onelogin.sharing.testapp.verifier.VerifierTestAppJourneyNavigation
 
 object MainActivityRoutes {
     internal fun NavGraphBuilder.configureTestAppRoutes(
-        mockCredentials: List<MockCredential>,
+        mockCredentials: List<MockCredentialState>,
         navController: NavController,
         presentCredentialSdk: PresentCredentialSdk,
         verifyCredentialSdk: VerifyCredentialSdk

@@ -20,13 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uk.gov.onelogin.sharing.testapp.CREDENTIAL_ITEM_TAG
 import uk.gov.onelogin.sharing.testapp.R
-import uk.gov.onelogin.sharing.testapp.credential.MockCredential
+import uk.gov.onelogin.sharing.testapp.credential.MockCredentialState
 
 @Composable
 internal fun SelectCredentialsScreen(
-    credentials: List<MockCredential>,
+    credentials: List<MockCredentialState>,
     modifier: Modifier = Modifier,
-    onSelectCredential: (MockCredential) -> Unit = {}
+    onSelectCredential: (MockCredentialState) -> Unit = {}
 ) {
     Surface(
         shape = RoundedCornerShape(24.dp),

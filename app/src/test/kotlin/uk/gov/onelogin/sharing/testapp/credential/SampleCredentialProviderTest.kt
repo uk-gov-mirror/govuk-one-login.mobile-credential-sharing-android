@@ -1,5 +1,6 @@
 package uk.gov.onelogin.sharing.testapp.credential
 
+import androidx.test.core.app.ApplicationProvider
 import java.security.Signature
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -10,20 +11,19 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import uk.gov.onelogin.sharing.orchestration.CredentialRequest
 import uk.gov.onelogin.sharing.testapp.SampleCredentialProviderStub
-import uk.gov.onelogin.sharing.testapp.credential.MockCredentialData.mockCredential
+import uk.gov.onelogin.sharing.testapp.credential.MockCredentialData.mockCredentialState
 
 @RunWith(RobolectricTestRunner::class)
 class SampleCredentialProviderTest {
+    private val realCredential = mockCredentialState.toCredential(
+        ApplicationProvider.getApplicationContext()
+    )
+
+    private val stubCredential = realCredential.copy(
+        privateKey = SampleCredentialProviderStub.keyPair.private.encoded
+    )
+
     private val credentialProvider by lazy {
-        val realCredential = mockCredential
-
-        val stubCredential = MockCredential(
-            id = realCredential.id,
-            displayName = realCredential.displayName,
-            rawCredential = realCredential.rawCredential,
-            privateKey = SampleCredentialProviderStub.keyPair.private.encoded
-        )
-
         SampleCredentialProvider(stubCredential)
     }
 
@@ -39,7 +39,7 @@ class SampleCredentialProviderTest {
         val credentials =
             credentialProvider.getCredentials(CredentialRequest(documentTypes = emptyList()))
 
-        assertArrayEquals(mockCredential.rawCredential, credentials.first().rawCredential)
+        assertArrayEquals(realCredential.rawCredential, credentials.first().rawCredential)
     }
 
     @Test
