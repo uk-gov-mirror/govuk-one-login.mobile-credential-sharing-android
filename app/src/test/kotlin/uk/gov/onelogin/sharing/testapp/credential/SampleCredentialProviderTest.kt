@@ -1,7 +1,5 @@
 package uk.gov.onelogin.sharing.testapp.credential
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import java.security.Signature
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,7 +14,6 @@ import uk.gov.onelogin.sharing.testapp.credential.MockCredentialData.mockCredent
 
 @RunWith(RobolectricTestRunner::class)
 class SampleCredentialProviderTest {
-    private val context: Context by lazy { ApplicationProvider.getApplicationContext() }
     private val credentialProvider by lazy {
         val realCredential = mockCredential
 
