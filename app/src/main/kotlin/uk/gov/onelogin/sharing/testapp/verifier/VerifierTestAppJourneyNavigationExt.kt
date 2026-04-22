@@ -32,7 +32,10 @@ object VerifierTestAppJourneyNavigationExt {
             val arguments: VerifierTestAppJourney = navBackStackEntry.toRoute()
             val verifier = remember { requestToVerifier(arguments.request) }
 
-            VerifierTestAppJourneyScreen(verifier, navController)
+            VerifierTestAppJourneyScreen(verifier) {
+                verifier.orchestrator.cancel()
+                navController.popBackStack()
+            }
         }
     }
 }
