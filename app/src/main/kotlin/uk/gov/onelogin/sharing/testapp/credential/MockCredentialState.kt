@@ -48,27 +48,27 @@ data class MockCredentialState(
             id = this.id,
             displayName = this.displayName,
             rawCredential = Base64.getUrlDecoder().decode(base64EncodedRawCredential),
-            privateKey = privateKey,
+            privateKey = privateKey
         )
     }
 
     companion object {
         val MockCredentialStateType: NavType<MockCredentialState> =
             object : NavType<MockCredentialState>(
-            isNullableAllowed = false
-        ) {
-            override fun get(bundle: Bundle, key: String): MockCredentialState? =
-                bundle.getString(key)?.let { parseValue(it) }
+                isNullableAllowed = false
+            ) {
+                override fun get(bundle: Bundle, key: String): MockCredentialState? =
+                    bundle.getString(key)?.let { parseValue(it) }
 
-            override fun put(bundle: Bundle, key: String, value: MockCredentialState) {
-                bundle.putString(key, serializeAsValue(value))
+                override fun put(bundle: Bundle, key: String, value: MockCredentialState) {
+                    bundle.putString(key, serializeAsValue(value))
+                }
+
+                override fun parseValue(value: String): MockCredentialState =
+                    Json.decodeFromString(value)
+
+                override fun serializeAsValue(value: MockCredentialState): String =
+                    Json.encodeToString(value)
             }
-
-            override fun parseValue(value: String): MockCredentialState =
-                Json.decodeFromString(value)
-
-            override fun serializeAsValue(value: MockCredentialState): String =
-                Json.encodeToString(value)
-        }
     }
 }
