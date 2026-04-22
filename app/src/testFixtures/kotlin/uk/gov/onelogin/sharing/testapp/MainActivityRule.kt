@@ -12,7 +12,7 @@ import androidx.test.core.app.ApplicationProvider
 class MainActivityRule(
     composeTestRule: ComposeContentTestRule,
     private val holderText: String,
-    private val verifierText: String,
+    private val verifierText: String
 ) : ComposeContentTestRule by composeTestRule {
 
     var hasStartedHolderJourney: Boolean = false
@@ -27,7 +27,7 @@ class MainActivityRule(
     ) : this(
         composeTestRule = composeTestRule,
         holderText = resources.getString(R.string.holder),
-        verifierText = resources.getString(R.string.verifier),
+        verifierText = resources.getString(R.string.verifier)
     )
 
     fun assertHolderIsDisplayed() {

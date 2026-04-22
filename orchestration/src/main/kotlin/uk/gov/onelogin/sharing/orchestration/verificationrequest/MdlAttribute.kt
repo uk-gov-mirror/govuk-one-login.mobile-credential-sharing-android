@@ -129,40 +129,52 @@ sealed interface MdlAttribute : Parcelable {
         private const val MAX_AGE = 99
         const val MAX_LENGTH = 150
 
-            override fun createFromParcel(parcel: Parcel): MdlAttribute {
-                val value = requireNotNull(parcel.readString()) {
-                    "Cannot read 'MdlAttribute' from parcel!"
-                }
+        override fun createFromParcel(parcel: Parcel): MdlAttribute {
+            val value = requireNotNull(parcel.readString()) {
+                "Cannot read 'MdlAttribute' from parcel!"
+            }
 
-                return when (value) {
-                    FamilyName.value -> FamilyName
-                    GivenName.value -> GivenName
-                    BirthDate.value -> BirthDate
-                    IssueDate.value -> IssueDate
-                    ExpiryDate.value -> ExpiryDate
-                    IssuingCountry.value -> IssuingCountry
-                    IssuingAuthority.value -> IssuingAuthority
-                    DocumentNumber.value -> DocumentNumber
-                    Portrait.value -> Portrait
-                    BirthPlace.value -> BirthPlace
-                    DrivingPrivileges.value -> DrivingPrivileges
-                    UnDistinguishingSign.value -> UnDistinguishingSign
-                    ResidentAddress.value -> ResidentAddress
-                    ResidentPostalCode.value -> ResidentPostalCode
-                    ResidentCity.value -> ResidentCity
-                    else -> {
-                        if (value.startsWith("age_over_")) {
-                            AgeOver(value.takeLast(2).toInt())
-                        } else {
-                            Custom(value)
-                        }
+            return when (value) {
+                FamilyName.value -> FamilyName
+
+                GivenName.value -> GivenName
+
+                BirthDate.value -> BirthDate
+
+                IssueDate.value -> IssueDate
+
+                ExpiryDate.value -> ExpiryDate
+
+                IssuingCountry.value -> IssuingCountry
+
+                IssuingAuthority.value -> IssuingAuthority
+
+                DocumentNumber.value -> DocumentNumber
+
+                Portrait.value -> Portrait
+
+                BirthPlace.value -> BirthPlace
+
+                DrivingPrivileges.value -> DrivingPrivileges
+
+                UnDistinguishingSign.value -> UnDistinguishingSign
+
+                ResidentAddress.value -> ResidentAddress
+
+                ResidentPostalCode.value -> ResidentPostalCode
+
+                ResidentCity.value -> ResidentCity
+
+                else -> {
+                    if (value.startsWith("age_over_")) {
+                        AgeOver(value.takeLast(2).toInt())
+                    } else {
+                        Custom(value)
                     }
                 }
             }
+        }
 
-            override fun newArray(size: Int): Array<MdlAttribute?> {
-                return arrayOfNulls(size)
-            }
-
+        override fun newArray(size: Int): Array<MdlAttribute?> = arrayOfNulls(size)
     }
 }

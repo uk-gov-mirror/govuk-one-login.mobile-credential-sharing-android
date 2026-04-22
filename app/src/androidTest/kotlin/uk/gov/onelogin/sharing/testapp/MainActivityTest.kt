@@ -18,7 +18,7 @@ class MainActivityTest {
 
     @get:Rule
     val composeRule = MainActivityRule(
-        composeTestRule = createAndroidComposeRule<MainActivity>(),
+        composeTestRule = createAndroidComposeRule<MainActivity>()
     )
 
     @Before

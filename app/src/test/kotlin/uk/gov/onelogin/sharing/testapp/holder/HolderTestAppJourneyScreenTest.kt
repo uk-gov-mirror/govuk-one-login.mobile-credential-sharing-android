@@ -40,7 +40,7 @@ class HolderTestAppJourneyScreenTest {
     @Composable
     private fun Render() {
         HolderTestAppJourneyScreen(
-            presenter = presenter,
+            component = presenter,
             onCloseJourney = composeTestRule::updateHasClosedJourney
         )
     }

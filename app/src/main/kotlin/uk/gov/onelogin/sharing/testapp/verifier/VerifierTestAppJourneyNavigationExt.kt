@@ -1,6 +1,8 @@
 package uk.gov.onelogin.sharing.testapp.verifier
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
@@ -32,11 +34,13 @@ object VerifierTestAppJourneyNavigationExt {
             val arguments: VerifierTestAppJourney = navBackStackEntry.toRoute()
             val verifier = remember { requestToVerifier(arguments.request) }
 
-            VerifierTestAppJourneyScreen(verifier) {
+            VerifierTestAppJourneyScreen(
+                verifier = verifier,
+                modifier = Modifier.fillMaxSize()
+            ) {
                 verifier.orchestrator.cancel()
                 navController.popBackStack()
             }
         }
     }
 }
-

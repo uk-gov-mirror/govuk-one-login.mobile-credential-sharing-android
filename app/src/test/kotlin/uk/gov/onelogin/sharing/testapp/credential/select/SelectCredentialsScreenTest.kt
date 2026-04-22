@@ -22,7 +22,7 @@ class SelectCredentialsScreenTest {
 
     private val credentials = listOf(
         mockCredential,
-        otherCredential,
+        otherCredential
     )
 
     @Test

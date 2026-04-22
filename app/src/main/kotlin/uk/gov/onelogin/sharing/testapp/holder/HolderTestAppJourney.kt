@@ -8,4 +8,3 @@ import uk.gov.onelogin.sharing.testapp.credential.MockCredential
 @Parcelize
 @Serializable
 internal data class HolderTestAppJourney(val credential: MockCredential) : Parcelable
-

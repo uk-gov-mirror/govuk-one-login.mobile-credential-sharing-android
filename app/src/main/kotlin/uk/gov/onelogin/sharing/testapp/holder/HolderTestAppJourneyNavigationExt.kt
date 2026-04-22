@@ -1,6 +1,8 @@
 package uk.gov.onelogin.sharing.testapp.holder
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
@@ -14,7 +16,7 @@ import uk.gov.onelogin.sharing.testapp.credential.MockCredential.Companion.MockC
 object HolderTestAppJourneyNavigationExt {
     fun NavController.navigateToTestAppHolderJourney(
         credential: MockCredential,
-        options: NavOptionsBuilder.() -> Unit = {},
+        options: NavOptionsBuilder.() -> Unit = {}
     ) = navigate(
         HolderTestAppJourney(credential = credential),
         options
@@ -22,7 +24,7 @@ object HolderTestAppJourneyNavigationExt {
 
     internal fun NavGraphBuilder.configureHolderJourneyWrapper(
         navController: NavController,
-        component: (MockCredential) -> CredentialPresenter,
+        component: (MockCredential) -> CredentialPresenter
     ) {
         composable<HolderTestAppJourney>(
             typeMap = mapOf(
@@ -32,11 +34,13 @@ object HolderTestAppJourneyNavigationExt {
             val arguments: HolderTestAppJourney = navBackStackEntry.toRoute()
             val presenter = remember { component(arguments.credential) }
 
-            HolderTestAppJourneyScreen(presenter) {
+            HolderTestAppJourneyScreen(
+                component = presenter,
+                modifier = Modifier.fillMaxSize()
+            ) {
                 presenter.orchestrator.cancel()
                 navController.popBackStack()
             }
         }
     }
 }
-

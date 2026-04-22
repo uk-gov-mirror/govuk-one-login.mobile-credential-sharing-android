@@ -25,7 +25,7 @@ object MainActivityRoutes {
         mockCredentials: List<MockCredential>,
         navController: NavController,
         presentCredentialSdk: PresentCredentialSdk,
-        verifyCredentialSdk: VerifyCredentialSdk,
+        verifyCredentialSdk: VerifyCredentialSdk
     ) {
         configureTestAppHomeScreen(
             onStartHolderJourney = {

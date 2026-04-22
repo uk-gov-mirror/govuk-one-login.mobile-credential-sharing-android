@@ -21,7 +21,7 @@ import uk.gov.onelogin.sharing.testapp.R
 fun TestAppScreen(
     modifier: Modifier = Modifier,
     onStartHolderJourney: () -> Unit = {},
-    onStartVerifierJourney: () -> Unit = {},
+    onStartVerifierJourney: () -> Unit = {}
 ) {
     Scaffold(modifier = modifier) { contentPadding ->
         Column(

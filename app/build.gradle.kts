@@ -137,6 +137,6 @@ dependencies {
         testFixtures(projects.core), // Remove once SDK prerequisites screen handles permissions
         testFixtures(projects.holder),
         testFixtures(projects.orchestration),
-        testFixtures(projects.sdk),
+        testFixtures(projects.sdk)
     ).forEach(::testImplementation)
 }

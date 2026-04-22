@@ -24,11 +24,11 @@ class MockCredentialsTest {
     private val context: Context = mockk {
         every { resources } returns mockk<Resources> {
             every { openRawResource(R.raw.mock_credential) } returns
-                    ByteArrayInputStream(base64EncodedCredential.toByteArray())
+                ByteArrayInputStream(base64EncodedCredential.toByteArray())
         }
         every { assets } returns mockk<AssetManager> {
             every { open("test_private_key.pem") } returns
-                    ByteArrayInputStream(privateKeyContent.toByteArray())
+                ByteArrayInputStream(privateKeyContent.toByteArray())
         }
     }
 

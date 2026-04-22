@@ -12,7 +12,7 @@ import uk.gov.onelogin.sharing.testapp.home.TestAppScreen
 class MainActivityTest {
     @get:Rule
     val composeTestRule = MainActivityRule(
-        composeTestRule = createComposeRule(),
+        composeTestRule = createComposeRule()
     )
 
     @Test
@@ -48,7 +48,7 @@ class MainActivityTest {
     fun Render() {
         TestAppScreen(
             onStartHolderJourney = { composeTestRule.updateStartHolderJourney() },
-            onStartVerifierJourney = { composeTestRule.updateStartVerifierJourney() },
+            onStartVerifierJourney = { composeTestRule.updateStartVerifierJourney() }
         )
     }
 }

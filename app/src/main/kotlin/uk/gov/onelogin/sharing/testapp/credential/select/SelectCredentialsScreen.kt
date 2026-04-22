@@ -26,12 +26,12 @@ import uk.gov.onelogin.sharing.testapp.credential.MockCredential
 internal fun SelectCredentialsScreen(
     credentials: List<MockCredential>,
     modifier: Modifier = Modifier,
-    onSelectCredential: (MockCredential) -> Unit = {},
+    onSelectCredential: (MockCredential) -> Unit = {}
 ) {
     Surface(
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(1.dp, Color.Gray),
-        modifier = modifier,
+        modifier = modifier
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Text(

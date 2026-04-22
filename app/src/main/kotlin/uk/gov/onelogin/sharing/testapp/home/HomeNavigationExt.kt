@@ -9,13 +9,13 @@ object HomeNavigationExt {
 
     internal fun NavGraphBuilder.configureTestAppHomeScreen(
         onStartHolderJourney: () -> Unit = {},
-        onStartVerifierJourney: () -> Unit = {},
+        onStartVerifierJourney: () -> Unit = {}
     ) {
         composable<HomeRoute> {
             TestAppScreen(
                 modifier = Modifier.fillMaxSize(),
                 onStartHolderJourney = onStartHolderJourney,
-                onStartVerifierJourney = onStartVerifierJourney,
+                onStartVerifierJourney = onStartVerifierJourney
             )
         }
     }

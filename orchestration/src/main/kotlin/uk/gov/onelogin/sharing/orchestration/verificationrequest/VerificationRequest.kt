@@ -9,10 +9,8 @@ import kotlinx.serialization.json.Json
 
 @Parcelize
 @Serializable
-data class VerificationRequest(
-    val documentType: String,
-    val attributeGroup: AttributeGroup,
-) : Parcelable {
+data class VerificationRequest(val documentType: String, val attributeGroup: AttributeGroup) :
+    Parcelable {
     val requestedElements: List<String>
         get() = attributeGroup.attributes.keys.map { it.value }
 
@@ -25,7 +23,7 @@ data class VerificationRequest(
 
         fun raw(
             documentType: String,
-            requestedElements: Map<String, Boolean>,
+            requestedElements: Map<String, Boolean>
         ): VerificationRequest = VerificationRequest(
             documentType = documentType,
             attributeGroup = AttributeGroup(

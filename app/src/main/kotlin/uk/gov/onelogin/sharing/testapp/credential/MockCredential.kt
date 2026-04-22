@@ -60,11 +60,11 @@ data class MockCredential(
                 bundle.putString(key, serializeAsValue(value))
             }
 
-            override fun parseValue(value: String): MockCredential = Json.Default.decodeFromString(value)
+            override fun parseValue(value: String): MockCredential =
+                Json.Default.decodeFromString(value)
 
-            override fun serializeAsValue(
-                value: MockCredential
-            ): String = Json.Default.encodeToString(value)
+            override fun serializeAsValue(value: MockCredential): String =
+                Json.Default.encodeToString(value)
         }
     }
 }

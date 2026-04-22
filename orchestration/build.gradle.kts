@@ -46,7 +46,7 @@ dependencies {
         libs.com.google.guava.android,
         libs.bundles.androidx.camera,
         libs.kotlinx.serialization.json,
-        libs.metro.viewmodel.compose,
+        libs.metro.viewmodel.compose
     ).forEach(::implementation)
 
     listOf(

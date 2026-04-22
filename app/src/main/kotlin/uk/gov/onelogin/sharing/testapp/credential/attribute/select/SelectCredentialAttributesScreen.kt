@@ -30,7 +30,7 @@ import uk.gov.onelogin.sharing.testapp.VERIFY_CREDENTIAL_BUTTON_TAG
 @Composable
 internal fun SelectCredentialAttributesScreen(
     modifier: Modifier = Modifier,
-    onSelectAttributeGroup: (AttributeGroup) -> Unit = {},
+    onSelectAttributeGroup: (AttributeGroup) -> Unit = {}
 ) {
     var selected by rememberSaveable {
         mutableStateOf(VerifierAttributeOption.PHOTO_AND_AGE_OVER_21)
@@ -39,7 +39,7 @@ internal fun SelectCredentialAttributesScreen(
     Surface(
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(1.dp, Color.Gray),
-        modifier = modifier,
+        modifier = modifier
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Text(

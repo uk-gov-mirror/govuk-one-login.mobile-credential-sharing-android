@@ -49,9 +49,10 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             GdsTheme {
-                Column(modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
-                    .fillMaxSize()
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                        .fillMaxSize()
                 ) {
                     NavHost(
                         navController = navController,

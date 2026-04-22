@@ -8,9 +8,8 @@ import androidx.compose.ui.test.performClick
 import uk.gov.android.ui.componentsv2.rules.ComposeContentTestRuleExtensions.onAllNodesWithRole
 import uk.gov.onelogin.sharing.testapp.credential.MockCredential
 
-class SelectCredentialsScreenRule(
-    composeTestRule: ComposeContentTestRule
-) : ComposeContentTestRule by composeTestRule {
+class SelectCredentialsScreenRule(composeTestRule: ComposeContentTestRule) :
+    ComposeContentTestRule by composeTestRule {
     private var selectedCredential: MockCredential? = null
 
     fun assertSelectableCredentialCount(expected: Int) = onAllNodesWithRole(Role.Button)
