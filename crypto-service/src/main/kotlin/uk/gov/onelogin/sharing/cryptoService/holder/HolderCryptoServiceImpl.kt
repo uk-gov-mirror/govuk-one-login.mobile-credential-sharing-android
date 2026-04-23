@@ -64,7 +64,10 @@ class HolderCryptoServiceImpl(
     ): DeviceAuthenticationResult {
         val deviceNameSpacesBytes = encodeDeviceNameSpacesBytes()
 
-        logger.debug(logTag, "DeviceNameSpacesBytes generated (${deviceNameSpacesBytes.size} bytes)")
+        logger.debug(
+            logTag,
+            "DeviceNameSpacesBytes generated (${deviceNameSpacesBytes.size} bytes)"
+        )
 
         val deviceAuthenticationBytes = DeviceAuthentication(
             sessionTranscript = sessionTranscript,
@@ -72,7 +75,10 @@ class HolderCryptoServiceImpl(
             deviceNameSpacesBytes = deviceNameSpacesBytes
         ).encodeCbor()
 
-        logger.debug(logTag, "DeviceAuthenticationBytes encoded (${deviceAuthenticationBytes.size} bytes)")
+        logger.debug(
+            logTag,
+            "DeviceAuthenticationBytes encoded (${deviceAuthenticationBytes.size} bytes)"
+        )
 
         return DeviceAuthenticationResult(
             deviceAuthenticationBytes = deviceAuthenticationBytes,
