@@ -149,17 +149,15 @@ fun SessionData.encodeCbor(): ByteArray {
  */
 fun DeviceAuthentication.encodeCbor(): ByteArray {
     val deviceAuthenticationArray = ByteArrayOutputStream().also { out ->
-        CBORFactory().createGenerator(out).use { gen ->
-            gen.writeStartArray(null, DeviceAuthentication.ELEMENT_COUNT)
-            gen.writeString(label)
-            gen.flush()
-            out.write(sessionTranscript)
-            CBORFactory().createGenerator(out).use { innerGen ->
-                innerGen.writeString(docType)
-                innerGen.flush()
-            }
-            out.write(deviceNameSpacesBytes)
+        val gen = CBORFactory().createGenerator(out)
+        gen.writeStartArray(null, DeviceAuthentication.ELEMENT_COUNT)
+        gen.writeString(label)
+        gen.flush()
+        out.write(sessionTranscript)
+        CBORFactory().createGenerator(out).use { innerGen ->
+            innerGen.writeString(docType)
         }
+        out.write(deviceNameSpacesBytes)
     }.toByteArray()
     return EmbeddedCbor(deviceAuthenticationArray).encodeCbor()
 }
