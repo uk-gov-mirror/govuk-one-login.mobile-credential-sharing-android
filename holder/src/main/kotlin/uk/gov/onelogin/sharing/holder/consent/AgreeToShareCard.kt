@@ -54,7 +54,7 @@ private val DIVIDER_THICKNESS = 1.dp
 @Composable
 internal fun AgreeToShareCard(
     card: ConsentCard,
-    organizationName: String?,
+    organizationName: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -82,31 +82,31 @@ internal fun AgreeToShareCard(
             RetentionVariant.ALL_DETAILS_KEPT -> {
                 SectionDivider()
                 AttributeList(card.attributes)
-                organizationName?.let {
-                    SectionDivider()
-                    RetentionBand {
-                        RetentionText(stringResource(R.string.holder_consent_card_all_kept, it))
-                    }
+                SectionDivider()
+                RetentionBand {
+                    RetentionText(
+                        stringResource(R.string.holder_consent_card_all_kept, organizationName)
+                    )
                 }
             }
 
             RetentionVariant.SOME_DETAILS_KEPT -> {
-                organizationName?.let {
-                    SectionDivider()
-                    RetentionBand {
-                        RetentionText(stringResource(R.string.holder_consent_card_will_keep, it))
-                    }
-                    SectionDivider()
-                    AttributeList(card.keptAttributes)
-                    SectionDivider()
-                    RetentionBand {
-                        RetentionText(
-                            stringResource(R.string.holder_consent_card_will_not_keep, it)
-                        )
-                    }
-                    SectionDivider()
-                    AttributeList(card.notKeptAttributes)
+                SectionDivider()
+                RetentionBand {
+                    RetentionText(
+                        stringResource(R.string.holder_consent_card_will_keep, organizationName)
+                    )
                 }
+                SectionDivider()
+                AttributeList(card.keptAttributes)
+                SectionDivider()
+                RetentionBand {
+                    RetentionText(
+                        stringResource(R.string.holder_consent_card_will_not_keep, organizationName)
+                    )
+                }
+                SectionDivider()
+                AttributeList(card.notKeptAttributes)
             }
         }
     }
